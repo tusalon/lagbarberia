@@ -1,7 +1,7 @@
-// admin-app.js - Panel de administración (VERSIÓN GENÉRICA)
-// SIN NINGÚN NOMBRE DE CLIENTE HARCODEADO
+// admin-app.js - Panel de administración (VERSIÓN CON SOLICITUDES)
+// CON SISTEMA DE APROBACIÓN DE CLIENTES
 
-console.log('🚀 ADMIN-APP.JS - Panel de administración');
+console.log('🚀 ADMIN-APP.JS - Panel de administración con solicitudes');
 
 window.addEventListener('error', function(e) {
     console.error('❌ Error detectado, posible versión antigua:', e.message);
@@ -315,7 +315,13 @@ function AdminApp() {
     const [clientesRegistrados, setClientesRegistrados] = React.useState([]);
     const [errorClientes, setErrorClientes] = React.useState('');
     const [cargandoClientes, setCargandoClientes] = React.useState(false);
-
+    
+    // ============================================
+    // ESTADOS PARA SOLICITUDES
+    // ============================================
+    const [solicitudesPendientes, setSolicitudesPendientes] = React.useState([]);
+    const [cargandoSolicitudes, setCargandoSolicitudes] = React.useState(false);
+    
     const [showNuevaReservaModal, setShowNuevaReservaModal] = React.useState(false);
     const [nuevaReservaData, setNuevaReservaData] = React.useState({
         cliente_nombre: '',
@@ -325,7 +331,7 @@ function AdminApp() {
         fecha: '',
         hora_inicio: ''
     });
-
+    
     const [serviciosList, setServiciosList] = React.useState([]);
     const [profesionalesList, setProfesionalesList] = React.useState([]);
     const [horariosDisponibles, setHorariosDisponibles] = React.useState([]);
@@ -416,11 +422,11 @@ function AdminApp() {
                 setHorariosDisponibles([]);
                 return;
             }
-
+            
             try {
                 const servicio = serviciosList.find(s => s.nombre === nuevaReservaData.servicio);
                 if (!servicio) return;
-
+                
                 const horarios = await window.salonConfig.getHorariosProfesional(nuevaReservaData.profesional_id);
                 const horasTrabajo = horarios.horas || [];
                 
@@ -437,51 +443,51 @@ function AdminApp() {
                 );
                 
                 const reservas = await response.json();
-
+                
                 const ahora = new Date();
                 const horaActual = ahora.getHours();
                 const minutosActuales = ahora.getMinutes();
                 const totalMinutosActual = horaActual * 60 + minutosActuales;
                 const minAllowedMinutes = totalMinutosActual + 120;
-
+                
                 const hoy = new Date().toISOString().split('T')[0];
                 const esHoy = nuevaReservaData.fecha === hoy;
-
+                
                 const disponibles = slotsTrabajo.filter(slot => {
                     const [horas, minutos] = slot.split(':').map(Number);
                     const slotStart = horas * 60 + minutos;
                     const slotEnd = slotStart + servicio.duracion;
-
+                    
                     if (esHoy && slotStart < minAllowedMinutes) {
                         return false;
                     }
-
+                    
                     const tieneConflicto = reservas.some(reserva => {
                         const reservaStart = timeToMinutes(reserva.hora_inicio);
                         const reservaEnd = timeToMinutes(reserva.hora_fin);
                         return (slotStart < reservaEnd) && (slotEnd > reservaStart);
                     });
-
+                    
                     return !tieneConflicto;
                 });
-
+                
                 disponibles.sort((a, b) => {
                     const [hA, mA] = a.split(':').map(Number);
                     const [hB, mB] = b.split(':').map(Number);
                     return (hA * 60 + mA) - (hB * 60 + mB);
                 });
-
+                
                 setHorariosDisponibles(disponibles);
-
+                
             } catch (error) {
                 console.error('Error cargando horarios:', error);
                 setHorariosDisponibles([]);
             }
         };
-
+        
         cargarHorarios();
     }, [nuevaReservaData.profesional_id, nuevaReservaData.fecha, nuevaReservaData.servicio, serviciosList]);
-
+    
     const cargarDisponibilidadMes = async (fecha, profesionalId) => {
         if (!profesionalId) return;
         
@@ -558,7 +564,7 @@ function AdminApp() {
             console.error('Error cargando disponibilidad:', error);
         }
     };
-
+    
     const cambiarMes = (direccion) => {
         const nuevaFecha = new Date(currentDate);
         nuevaFecha.setMonth(currentDate.getMonth() + direccion);
@@ -568,7 +574,7 @@ function AdminApp() {
             cargarDisponibilidadMes(nuevaFecha, nuevaReservaData.profesional_id);
         }
     };
-
+    
     const getDaysInMonth = () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -588,14 +594,14 @@ function AdminApp() {
         
         return days;
     };
-
+    
     const formatDate = (date) => {
         const y = date.getFullYear();
         const m = (date.getMonth() + 1).toString().padStart(2, '0');
         const d = date.getDate().toString().padStart(2, '0');
         return `${y}-${m}-${d}`;
     };
-
+    
     const isDateAvailable = (date) => {
         if (!date || !nuevaReservaData.profesional_id) return false;
         
@@ -608,14 +614,14 @@ function AdminApp() {
         
         return fechasConHorarios[fechaStr] || false;
     };
-
+    
     const handleDateSelect = (date) => {
         if (isDateAvailable(date)) {
             const fechaStr = formatDate(date);
             setNuevaReservaData({...nuevaReservaData, fecha: fechaStr, hora_inicio: ''});
         }
     };
-
+    
     const handleCrearReservaManual = async () => {
         if (!nuevaReservaData.cliente_nombre || !nuevaReservaData.cliente_whatsapp || 
             !nuevaReservaData.servicio || !nuevaReservaData.profesional_id || 
@@ -623,7 +629,7 @@ function AdminApp() {
             alert('Completá todos los campos');
             return;
         }
-
+        
         try {
             const servicio = serviciosList.find(s => s.nombre === nuevaReservaData.servicio);
             if (!servicio) {
@@ -651,7 +657,7 @@ function AdminApp() {
                 hora_fin: endTime,
                 estado: "Reservado"
             };
-
+            
             console.log('📤 Creando reserva manual:', bookingData);
             
             const result = await createBooking(bookingData);
@@ -676,7 +682,7 @@ function AdminApp() {
             alert('❌ Error al crear la reserva: ' + error.message);
         }
     };
-
+    
     // ============================================
     // FUNCIONES DE CLIENTES
     // ============================================
@@ -707,7 +713,7 @@ function AdminApp() {
             setCargandoClientes(false);
         }
     };
-
+    
     const handleEliminarCliente = async (whatsapp) => {
         if (!confirm('¿Seguro que querés eliminar este cliente? Perderá el acceso a la app.')) return;
         console.log('🗑️ Eliminando cliente:', whatsapp);
@@ -726,7 +732,176 @@ function AdminApp() {
             alert('Error al eliminar cliente');
         }
     };
+    
+    // ============================================
+    // FUNCIONES DE SOLICITUDES
+    // ============================================
+    
+    const cargarSolicitudesPendientes = async () => {
+        setCargandoSolicitudes(true);
+        try {
+            const negocioId = getNegocioId();
+            console.log('📋 Cargando solicitudes pendientes...');
+            
+            if (typeof window.getSolicitudesPendientes === 'function') {
+                const solicitudes = await window.getSolicitudesPendientes();
+                setSolicitudesPendientes(Array.isArray(solicitudes) ? solicitudes : []);
+            } else {
+                const response = await fetch(
+                    `${window.SUPABASE_URL}/rest/v1/cliente_solicitudes?negocio_id=eq.${negocioId}&estado=eq.pendiente&order=fecha_solicitud.desc`,
+                    {
+                        headers: {
+                            'apikey': window.SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+                        }
+                    }
+                );
+                
+                if (!response.ok) {
+                    console.error('Error cargando solicitudes:', await response.text());
+                    setSolicitudesPendientes([]);
+                    return;
+                }
+                
+                const data = await response.json();
+                setSolicitudesPendientes(Array.isArray(data) ? data : []);
+            }
+            
+            console.log(`✅ Solicitudes pendientes: ${solicitudesPendientes.length}`);
+        } catch (error) {
+            console.error('Error cargando solicitudes:', error);
+            setSolicitudesPendientes([]);
+        } finally {
+            setCargandoSolicitudes(false);
+        }
+    };
+    
+    const aprobarSolicitud = async (solicitud) => {
+        if (!confirm(`¿Aprobar a ${solicitud.nombre}? Se le enviará un WhatsApp de confirmación.`)) return;
+        
+        try {
+            console.log(`✅ Aprobando solicitud de ${solicitud.nombre}`);
+            
+            if (typeof window.aprobarSolicitudCliente === 'function') {
+                const resultado = await window.aprobarSolicitudCliente(solicitud);
+                if (resultado) {
+                    alert(`✅ Cliente ${solicitud.nombre} aprobado correctamente`);
+                    await cargarSolicitudesPendientes();
+                    await loadClientesRegistrados();
+                } else {
+                    alert('❌ Error al aprobar la solicitud');
+                }
+            } else {
+                // Fallback manual
+                const negocioId = getNegocioId();
+                
+                // Insertar en clientes_autorizados
+                const nuevoCliente = {
+                    negocio_id: negocioId,
+                    nombre: solicitud.nombre,
+                    whatsapp: solicitud.whatsapp,
+                    fecha_aprobacion: new Date().toISOString(),
+                    fecha_registro: new Date().toISOString()
+                };
+                
+                const insertResponse = await fetch(
+                    `${window.SUPABASE_URL}/rest/v1/clientes_autorizados`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'apikey': window.SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(nuevoCliente)
+                    }
+                );
+                
+                if (!insertResponse.ok) {
+                    throw new Error('Error al insertar cliente');
+                }
+                
+                // Actualizar estado de la solicitud
+                await fetch(
+                    `${window.SUPABASE_URL}/rest/v1/cliente_solicitudes?negocio_id=eq.${negocioId}&id=eq.${solicitud.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': window.SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ estado: 'aprobado' })
+                    }
+                );
+                
+                // Enviar WhatsApp de confirmación
+                const configNegocio = await window.cargarConfiguracionNegocio();
+                const nombreNegocio = configNegocio?.nombre || 'nuestro salón';
+                
+                const mensajeCliente = 
+`✅ *¡FELICITACIONES!* Tu solicitud fue APROBADA.
 
+Ya podés reservar turnos en *${nombreNegocio}*.
+
+📱 Ingresá con tu número: ${solicitud.whatsapp}
+
+¡Te esperamos! 💖`;
+                
+                if (window.enviarWhatsApp) {
+                    window.enviarWhatsApp(solicitud.whatsapp, mensajeCliente);
+                }
+                
+                alert(`✅ Cliente ${solicitud.nombre} aprobado correctamente`);
+                await cargarSolicitudesPendientes();
+                await loadClientesRegistrados();
+            }
+        } catch (error) {
+            console.error('Error aprobando solicitud:', error);
+            alert('❌ Error al aprobar la solicitud');
+        }
+    };
+    
+    const rechazarSolicitud = async (solicitud) => {
+        if (!confirm(`¿Rechazar a ${solicitud.nombre}? No se le enviará ninguna notificación.`)) return;
+        
+        try {
+            console.log(`❌ Rechazando solicitud de ${solicitud.nombre}`);
+            
+            if (typeof window.rechazarSolicitudCliente === 'function') {
+                const resultado = await window.rechazarSolicitudCliente(solicitud);
+                if (resultado) {
+                    alert(`❌ Cliente ${solicitud.nombre} rechazado (no se notificó)`);
+                    await cargarSolicitudesPendientes();
+                } else {
+                    alert('❌ Error al rechazar la solicitud');
+                }
+            } else {
+                // Fallback manual
+                const negocioId = getNegocioId();
+                
+                await fetch(
+                    `${window.SUPABASE_URL}/rest/v1/cliente_solicitudes?negocio_id=eq.${negocioId}&id=eq.${solicitud.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': window.SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ estado: 'rechazado' })
+                    }
+                );
+                
+                alert(`❌ Cliente ${solicitud.nombre} rechazado (no se notificó)`);
+                await cargarSolicitudesPendientes();
+            }
+        } catch (error) {
+            console.error('Error rechazando solicitud:', error);
+            alert('❌ Error al rechazar la solicitud');
+        }
+    };
+    
     // ============================================
     // FUNCIONES DE RESERVAS
     // ============================================
@@ -764,7 +939,7 @@ function AdminApp() {
             setLoading(false);
         }
     };
-
+    
     React.useEffect(() => {
         const intervalo = setInterval(() => {
             console.log('⏰ Verificando turnos para completar...');
@@ -777,12 +952,13 @@ function AdminApp() {
         
         return () => clearInterval(intervalo);
     }, []);
-
+    
     React.useEffect(() => {
         fetchBookings();
         
         if (userRole === 'admin' || (userRole === 'profesional' && userNivel >= 2)) {
             loadClientesRegistrados();
+            cargarSolicitudesPendientes();
         }
         
         console.log('🔍 Verificando auth:', {
@@ -791,7 +967,7 @@ function AdminApp() {
             profesional
         });
     }, [userRole, userNivel, profesional]);
-
+    
     // ============================================
     // FUNCIÓN PARA CONFIRMAR PAGO
     // ============================================
@@ -848,7 +1024,7 @@ Hola *${bookingData.cliente_nombre}*, ¡tu turno ha sido CONFIRMADO!
 
 Te esperamos 💖
 Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipación.`;
-
+            
             window.enviarWhatsApp(bookingData.cliente_whatsapp, mensajeCliente);
             
             alert('✅ Pago confirmado. Turno reservado y cliente notificado.');
@@ -859,7 +1035,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
             alert('❌ Error al confirmar el pago');
         }
     };
-
+    
     // ============================================
     // FUNCIÓN PARA BORRAR TODAS LAS RESERVAS CANCELADAS
     // ============================================
@@ -889,14 +1065,14 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
             }
             
             alert(`✅ Se borraron todas las reservas canceladas correctamente`);
-            fetchBookings(); // Recargar la lista
+            fetchBookings();
             
         } catch (error) {
             console.error('Error:', error);
             alert('❌ Error al conectar con el servidor');
         }
     };
-
+    
     // ============================================
     // HANDLE CANCEL
     // ============================================
@@ -919,7 +1095,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
             alert('❌ Error al cancelar');
         }
     };
-
+    
     const handleLogout = () => {
         if (confirm('¿Cerrar sesión?')) {
             localStorage.removeItem('adminAuth');
@@ -931,10 +1107,10 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
             localStorage.removeItem('negocioId');
             
             console.log('🚪 Sesión cerrada, redirigiendo a index.html');
-            window.location.href = 'index.html'; // Cambiado de admin-login.html a index.html
+            window.location.href = 'index.html';
         }
     };
-
+    
     // ============================================
     // FILTROS
     // ============================================
@@ -964,16 +1140,21 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
         
         return resultado;
     };
-
+    
     const activasCount = bookings.filter(b => b.estado === 'Reservado').length;
     const pendientesCount = bookings.filter(b => b.estado === 'Pendiente').length;
     const completadasCount = bookings.filter(b => b.estado === 'Completado').length;
     const canceladasCount = bookings.filter(b => b.estado === 'Cancelado').length;
     const filteredBookings = getFilteredBookings();
-
+    
     const getTabsDisponibles = () => {
         const tabs = [];
         tabs.push({ id: 'reservas', icono: '📅', label: userRole === 'profesional' ? 'Mis Reservas' : 'Reservas' });
+        
+        // 🆕 Pestaña Solicitudes (para admin y nivel 2+)
+        if (userRole === 'admin' || (userRole === 'profesional' && userNivel >= 2)) {
+            tabs.push({ id: 'solicitudes', icono: '🆕', label: 'Solicitudes' });
+        }
         
         if (userRole === 'admin' || (userRole === 'profesional' && userNivel >= 2)) {
             tabs.push({ id: 'configuracion', icono: '⚙️', label: 'Configuración' });
@@ -987,7 +1168,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
         
         return tabs;
     };
-
+    
     const abrirModalNuevaReserva = () => {
         setNuevaReservaData({
             cliente_nombre: '',
@@ -1002,11 +1183,11 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
         setFechasConHorarios({});
         setShowNuevaReservaModal(true);
     };
-
+    
     const tabsDisponibles = getTabsDisponibles();
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const days = getDaysInMonth();
-
+    
     return (
         <div className="min-h-screen bg-pink-50 p-3 sm:p-6">
             <div className="max-w-6xl mx-auto space-y-4">
@@ -1026,7 +1207,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                             <p className="text-xs text-pink-500">Panel de Administración</p>
                         </div>
                     </div>
-
+                    
                     {/* Botones de acción */}
                     <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                         <button
@@ -1036,7 +1217,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                             <span className="text-lg">💖</span>
                             <span className="font-medium">Editar Negocio</span>
                         </button>
-
+                        
                         <button 
                             onClick={() => {
                                 cargarConfiguracion();
@@ -1047,7 +1228,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         >
                             <i className="icon-refresh-cw text-pink-600"></i>
                         </button>
-
+                        
                         <button 
                             onClick={fetchBookings} 
                             className="p-2 bg-pink-50 rounded-full hover:bg-pink-100 transition-all hover:scale-105 border border-pink-200"
@@ -1055,7 +1236,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         >
                             <i className="icon-refresh-cw text-pink-600"></i>
                         </button>
-
+                        
                         <button 
                             onClick={handleLogout}
                             className="p-2 bg-pink-50 rounded-full hover:bg-pink-100 transition-all hover:scale-105 border border-pink-200"
@@ -1065,7 +1246,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         </button>
                     </div>
                 </div>
-
+                
                 {/* MODAL NUEVA RESERVA */}
                 {showNuevaReservaModal && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1079,7 +1260,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                     ×
                                 </button>
                             </div>
-
+                            
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Cliente *</label>
@@ -1091,7 +1272,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                         placeholder="Ej: Juan Pérez"
                                     />
                                 </div>
-
+                                
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp del Cliente *</label>
                                     <div className="flex">
@@ -1109,7 +1290,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                     </div>
                                     <p className="text-xs text-gray-400 mt-1">8 dígitos después del +53</p>
                                 </div>
-
+                                
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Servicio *</label>
                                     <select
@@ -1125,7 +1306,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                         ))}
                                     </select>
                                 </div>
-
+                                
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Profesional *</label>
                                     {userRole === 'profesional' && userNivel <= 2 ? (
@@ -1149,7 +1330,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                         </select>
                                     )}
                                 </div>
-
+                                
                                 {nuevaReservaData.profesional_id && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Fecha *</label>
@@ -1159,7 +1340,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                 <span className="font-bold text-gray-800">{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</span>
                                                 <button onClick={() => cambiarMes(1)} className="p-2 hover:bg-white rounded-full transition-colors">▶</button>
                                             </div>
-
+                                            
                                             <div className="p-3">
                                                 <div className="grid grid-cols-7 mb-2 text-center text-xs font-medium text-gray-400">
                                                     {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d, i) => (<div key={i}>{d}</div>))}
@@ -1168,7 +1349,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                 <div className="grid grid-cols-7 gap-1">
                                                     {days.map((date, idx) => {
                                                         if (!date) return <div key={idx} className="h-10" />;
-
+                                                        
                                                         const fechaStr = formatDate(date);
                                                         const available = isDateAvailable(date);
                                                         const selected = nuevaReservaData.fecha === fechaStr;
@@ -1199,7 +1380,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                         </div>
                                     </div>
                                 )}
-
+                                
                                 {nuevaReservaData.fecha && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Hora de inicio *</label>
@@ -1227,7 +1408,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                         )}
                                     </div>
                                 )}
-
+                                
                                 <div className="flex gap-3 pt-4">
                                     <button onClick={() => setShowNuevaReservaModal(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-100">Cancelar</button>
                                     <button onClick={handleCrearReservaManual} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Crear Reserva</button>
@@ -1236,7 +1417,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         </div>
                     </div>
                 )}
-
+                
                 {/* PESTAÑAS */}
                 <div className="bg-white p-2 rounded-xl shadow-sm flex flex-wrap gap-2">
                     {tabsDisponibles.map(tab => (
@@ -1254,7 +1435,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         </button>
                     ))}
                 </div>
-
+                
                 {/* CONTENIDO */}
                 {tabActivo === 'configuracion' && (
                     <ConfigPanel 
@@ -1262,15 +1443,125 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         modoRestringido={userRole === 'profesional' && userNivel === 2}
                     />
                 )}
-
+                
                 {tabActivo === 'servicios' && (userRole === 'admin' || userNivel >= 3) && (
                     <ServiciosPanel />
                 )}
-
+                
                 {tabActivo === 'profesionales' && (userRole === 'admin' || userNivel >= 3) && (
                     <ProfesionalesPanel />
                 )}
-
+                
+                {/* PESTAÑA SOLICITUDES */}
+                {tabActivo === 'solicitudes' && (userRole === 'admin' || userNivel >= 2) && (
+                    <div className="space-y-4">
+                        {/* Botón para cargar solicitudes */}
+                        <div className="flex justify-end">
+                            <button
+                                onClick={cargarSolicitudesPendientes}
+                                className="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-lg hover:bg-pink-200 transition"
+                            >
+                                <i className="icon-refresh-cw"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                        
+                        {cargandoSolicitudes ? (
+                            <div className="bg-white p-8 rounded-xl text-center">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
+                                <p className="text-pink-500 mt-4">Cargando solicitudes...</p>
+                            </div>
+                        ) : solicitudesPendientes.length === 0 ? (
+                            <div className="bg-white p-8 rounded-xl text-center border border-pink-200">
+                                <div className="text-5xl mb-4">✅</div>
+                                <p className="text-pink-600">No hay solicitudes pendientes</p>
+                                <p className="text-sm text-pink-400 mt-2">Cuando un cliente solicite registro, aparecerá aquí</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {solicitudesPendientes.map(solicitud => {
+                                    const fechaSolicitud = new Date(solicitud.fecha_solicitud);
+                                    const fechaFormateada = fechaSolicitud.toLocaleString('es-ES', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    });
+                                    
+                                    return (
+                                        <div key={solicitud.id} className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-l-yellow-500 border border-pink-200">
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <span className="text-2xl">👤</span>
+                                                        <h3 className="font-bold text-lg text-pink-800">{solicitud.nombre}</h3>
+                                                        <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pendiente</span>
+                                                    </div>
+                                                    
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mb-3">
+                                                        <div className="flex items-center gap-2 text-pink-600">
+                                                            <span>📱</span>
+                                                            <span>{solicitud.whatsapp}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-pink-600">
+                                                            <span>📅</span>
+                                                            <span>{fechaFormateada}</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {solicitud.dispositivo_info && (
+                                                        <div className="text-xs text-pink-400 bg-pink-50 p-2 rounded-lg mt-2">
+                                                            <span>📱 Dispositivo: {solicitud.dispositivo_info.substring(0, 100)}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                
+                                                <div className="flex gap-2 ml-4">
+                                                    <button
+                                                        onClick={() => aprobarSolicitud(solicitud)}
+                                                        className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition flex items-center gap-2"
+                                                        title="Aprobar cliente"
+                                                    >
+                                                        <span>✅</span>
+                                                        Aprobar
+                                                    </button>
+                                                    <button
+                                                        onClick={() => rechazarSolicitud(solicitud)}
+                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition flex items-center gap-2"
+                                                        title="Rechazar cliente (sin notificar)"
+                                                    >
+                                                        <span>❌</span>
+                                                        Rechazar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                        
+                        {/* Explicación del flujo */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
+                            <div className="flex items-start gap-2">
+                                <span className="text-blue-500 text-lg">💡</span>
+                                <div>
+                                    <p className="font-medium">¿Cómo funciona?</p>
+                                    <ul className="list-disc list-inside mt-1 space-y-1 text-xs">
+                                        <li>Los clientes no registrados envían una solicitud desde la app</li>
+                                        <li>Vos recibís una notificación por WhatsApp y push</li>
+                                        <li>Si <strong>aprobás</strong>, el cliente recibe un WhatsApp de bienvenida y puede reservar</li>
+                                        <li>Si <strong>rechazás</strong>, el cliente NO recibe ninguna notificación (solo queda rechazado en el sistema)</li>
+                                        <li>Los clientes pueden volver a solicitar si fueron rechazados</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
+                {/* PESTAÑA CLIENTES */}
                 {tabActivo === 'clientes' && (userRole === 'admin' || userNivel >= 2) && (
                     <div className="space-y-4">
                         {cargandoClientes && (
@@ -1279,7 +1570,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 <span className="text-pink-600">Cargando datos...</span>
                             </div>
                         )}
-
+                        
                         {/* CLIENTES REGISTRADOS */}
                         <div className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500">
                             <button
@@ -1335,7 +1626,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         </div>
                     </div>
                 )}
-
+                
                 {/* RESERVAS */}
                 {tabActivo === 'reservas' && (
                     <>
@@ -1346,13 +1637,13 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 </p>
                             </div>
                         )}
-
+                        
                         <div className="bg-white p-4 rounded-xl shadow-sm space-y-3">
                             <div className="flex flex-wrap gap-3 items-center">
                                 <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" />
                                 {filterDate && <button onClick={() => setFilterDate('')} className="text-pink-500 text-sm">Limpiar filtro</button>}
                             </div>
-
+                            
                             <div className="flex flex-wrap gap-2 items-center">
                                 <button onClick={() => setStatusFilter('activas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'activas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Activas ({activasCount})</button>
                                 <button onClick={() => setStatusFilter('pendientes')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'pendientes' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Pendientes ({pendientesCount})</button>
@@ -1373,7 +1664,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 )}
                             </div>
                         </div>
-
+                        
                         {loading ? (
                             <div className="text-center py-12">
                                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
