@@ -1,0 +1,22 @@
+{
+  "name": "Ketyca's Salón",
+  "short_name": "Ketyca",
+  "description": "Salón de belleza - Tu espacio de cuidado personal",
+  "start_url": "/ketycasalon/",
+  "scope": "/ketycasalon/",
+  "display": "standalone",
+  "background_color": "#ec4899",
+  "theme_color": "#ec4899",
+  "icons": [
+    {
+      "src": "/ketycasalon/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/ketycasalon/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
