@@ -8,11 +8,11 @@
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ec4899">
+    <meta name="theme-color" content="#3b82f6">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Ketyca">
+    <meta name="apple-mobile-web-app-title" content="LAG">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
     
@@ -97,7 +97,7 @@
                 const nombre = await window.getNombreNegocio();
                 if (nombre) {
                     document.title = `${nombre} - Reserva de Turnos`;
-                    document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content', nombre.split(' ')[0] || 'Ketyca');
+                    document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content', nombre.split(' ')[0] || 'LAG');
                 }
             } catch (error) {
                 console.error('Error cargando título:', error);
@@ -126,7 +126,7 @@
                 btn.style.bottom = '20px';
                 btn.style.right = '20px';
                 btn.style.zIndex = '9999';
-                btn.style.background = '#ec4899';
+                btn.style.background = '#3b82f6';
                 btn.style.color = 'white';
                 btn.style.padding = '15px 30px';
                 btn.style.borderRadius = '50px';

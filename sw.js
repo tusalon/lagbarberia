@@ -1,22 +1,22 @@
-// sw.js - Service Worker para Ketyca's Salón
+// sw.js - Service Worker para LAG Barberia
 
-const CACHE_NAME = 'ketycas-salon-v1';
+const CACHE_NAME = 'lag-barberia-v1';
 const urlsToCache = [
-  '/ketycasalon/',
-  '/ketycasalon/index.html',
-  '/ketycasalon/admin.html',
-  '/ketycasalon/admin-login.html',
-  '/ketycasalon/setup-wizard.html',
-  '/ketycasalon/editar-negocio.html',
-  '/ketycasalon/manifest.json',
-  '/ketycasalon/icons/icon-72x72.png',
-  '/ketycasalon/icons/icon-96x96.png',
-  '/ketycasalon/icons/icon-128x128.png',
-  '/ketycasalon/icons/icon-144x144.png',
-  '/ketycasalon/icons/icon-152x152.png',
-  '/ketycasalon/icons/icon-192x192.png',
-  '/ketycasalon/icons/icon-384x384.png',
-  '/ketycasalon/icons/icon-512x512.png'
+  '/lagbarberia/',
+  '/lagbarberia/index.html',
+  '/lagbarberia/admin.html',
+  '/lagbarberia/admin-login.html',
+  '/lagbarberia/setup-wizard.html',
+  '/lagbarberia/editar-negocio.html',
+  '/lagbarberia/manifest.json',
+  '/lagbarberia/icons/icon-72x72.png',
+  '/lagbarberia/icons/icon-96x96.png',
+  '/lagbarberia/icons/icon-128x128.png',
+  '/lagbarberia/icons/icon-144x144.png',
+  '/lagbarberia/icons/icon-152x152.png',
+  '/lagbarberia/icons/icon-192x192.png',
+  '/lagbarberia/icons/icon-384x384.png',
+  '/lagbarberia/icons/icon-512x512.png'
 ];
 
 // ============================================
@@ -108,7 +108,7 @@ self.addEventListener('fetch', event => {
           }
           // Si no hay cache y es imagen, devolver icon por defecto
           if (event.request.url.match(/\.(jpg|jpeg|png|gif|svg|webp)$/)) {
-            return caches.match('/ketycasalon/icons/icon-192x192.png');
+            return caches.match('/lagbarberia/icons/icon-192x192.png');
           }
           return new Response('Error de red', { status: 408 });
         });
@@ -138,6 +138,6 @@ self.addEventListener('message', event => {
   }
 });
 
-console.log('✅ Service Worker configurado para Ketyca\'s Salón');
+console.log('✅ Service Worker configurado para LAG Barberia');
 console.log('📦 Cache:', CACHE_NAME);
 console.log('📄 Archivos a cachear:', urlsToCache.length);

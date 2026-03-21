@@ -1,12 +1,12 @@
 // utils/config-negocio.js - VERSIÓN MULTI-TENANT CORREGIDA
-// CLIENTE: Ketyca's Salón
+// CLIENTE: LAG Barberia
 
 console.log('🏢 config-negocio.js cargado');
 
 // ============================================
 // 🔥 CONFIGURACIÓN POR CLIENTE - ¡LO ÚNICO QUE CAMBIA!
 // ============================================
-const NEGOCIO_ID_POR_DEFECTO = '742405d7-292e-424a-bd63-f6e6b09fd7d5'; // ID de Ketyca's Salón
+const NEGOCIO_ID_POR_DEFECTO = '1dc5adc6-ed9e-4931-833f-4f71645c9ef3'; // ID de LAG Barberia
 
 // Hacer accesible globalmente
 window.NEGOCIO_ID_POR_DEFECTO = NEGOCIO_ID_POR_DEFECTO;
@@ -116,7 +116,7 @@ window.cargarConfiguracionNegocio = async function(forceRefresh = false) {
  */
 window.getNombreNegocio = async function() {
     const config = await window.cargarConfiguracionNegocio();
-    return config?.nombre || 'Ketyca\'s Salón';
+    return config?.nombre || 'LAG Barberia';
 };
 
 /**
@@ -124,7 +124,7 @@ window.getNombreNegocio = async function() {
  */
 window.getTelefonoDuenno = async function() {
     const config = await window.cargarConfiguracionNegocio();
-    return config?.telefono || '53548206';
+    return config?.telefono || '53357234';
 };
 
 /**
@@ -132,7 +132,7 @@ window.getTelefonoDuenno = async function() {
  */
 window.getEmailNegocio = async function() {
     const config = await window.cargarConfiguracionNegocio();
-    return config?.email || 'castlerockcuba@gmail.com';
+    return config?.email || 'luisarielcuenta2021@gmail.com';
 };
 
 /**
@@ -164,7 +164,7 @@ window.getHorarioAtencion = async function() {
  */
 window.getMensajeBienvenida = async function() {
     const config = await window.cargarConfiguracionNegocio();
-    return config?.mensaje_bienvenida || '¡Bienvenida a Ketyca\'s Salón!';
+    return config?.mensaje_bienvenida || '¡Bienvenido a LAG Barberia!';
 };
 
 /**
@@ -180,7 +180,7 @@ window.getMensajeConfirmacion = async function() {
  */
 window.getNtfyTopic = async function() {
     const config = await window.cargarConfiguracionNegocio();
-    return config?.ntfy_topic || 'ketycas-salon';
+    return config?.ntfy_topic || 'lag-barberia';
 };
 
 /**
@@ -205,5 +205,5 @@ setTimeout(async () => {
     await window.cargarConfiguracionNegocio();
 }, 500);
 
-console.log('✅ config-negocio.js listo para Ketyca\'s Salón');
+console.log('✅ config-negocio.js listo para LAG Barberia');
 console.log('🏷️  ID configurado:', NEGOCIO_ID_POR_DEFECTO);
