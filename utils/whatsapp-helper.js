@@ -2,6 +2,8 @@
 // CON FORMATO EXACTO DE MENSAJE
 // + Función unificada para confirmación de reserva
 // + Servicio incluido en notificaciones push
+// + CORREGIDO: Push notification con limpieza de caracteres
+// + CORREGIDO: Detección de dispositivo para WhatsApp (móvil vs PC)
 
 console.log('📱 whatsapp-helper.js - VERSIÓN GENÉRICA');
 
@@ -27,7 +29,7 @@ async function getConfigNegocio() {
 }
 
 // ============================================
-// DETECTOR DE iOS
+// DETECTOR DE iOS Y DISPOSITIVO MÓVIL
 // ============================================
 window.esIOS = function() {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -35,8 +37,12 @@ window.esIOS = function() {
            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 };
 
+window.esMobile = function() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+};
+
 // ============================================
-// FUNCIÓN UNIVERSAL WHATSAPP (CORREGIDA - USA api.whatsapp.com Y location.href)
+// FUNCIÓN UNIVERSAL WHATSAPP (CORREGIDA - DETECCIÓN DE DISPOSITIVO)
 // ============================================
 window.enviarWhatsApp = function(telefono, mensaje) {
     try {
@@ -50,20 +56,40 @@ window.enviarWhatsApp = function(telefono, mensaje) {
         
         const mensajeCodificado = encodeURIComponent(mensaje);
         
-        const url = `https://api.whatsapp.com/send?phone=${numeroCompleto}&text=${mensajeCodificado}`;
+        // 🔥 DETECTAR SI ES MÓVIL O PC
+        const isMobile = window.esMobile();
         
-        console.log('🔗 Abriendo WhatsApp:', url);
+        let url;
+        if (isMobile) {
+            // En móvil: usar esquema de la app (abre WhatsApp directamente)
+            url = `whatsapp://send?phone=${numeroCompleto}&text=${mensajeCodificado}`;
+            console.log('📱 Móvil detectado, usando app:', url);
+        } else {
+            // En PC: usar WhatsApp Web
+            url = `https://web.whatsapp.com/send?phone=${numeroCompleto}&text=${mensajeCodificado}`;
+            console.log('💻 PC detectado, usando WhatsApp Web:', url);
+        }
         
-        window.location.href = url;
+        window.open(url, '_blank');
         return true;
+        
     } catch (error) {
         console.error('❌ Error en enviarWhatsApp:', error);
+        
+        // Fallback: usar API como respaldo
+        const telefonoLimpio = telefono.toString().replace(/\D/g, '');
+        let numeroCompleto = telefonoLimpio;
+        if (!numeroCompleto.startsWith('53')) {
+            numeroCompleto = `53${telefonoLimpio}`;
+        }
+        const mensajeCodificado = encodeURIComponent(mensaje);
+        window.open(`https://api.whatsapp.com/send?phone=${numeroCompleto}&text=${mensajeCodificado}`, '_blank');
         return false;
     }
 };
 
 // ============================================
-// FUNCIÓN PARA ENVIAR NOTIFICACIÓN PUSH
+// FUNCIÓN PARA ENVIAR NOTIFICACIÓN PUSH (CORREGIDA - LIMPIEZA DE CARACTERES)
 // ============================================
 window.enviarNotificacionPush = async function(titulo, mensaje, etiquetas = 'bell', prioridad = 'default') {
     try {
@@ -72,11 +98,23 @@ window.enviarNotificacionPush = async function(titulo, mensaje, etiquetas = 'bel
         
         console.log(`📢 Enviando push a ntfy.sh/${topic}:`, titulo);
         
-        const tituloLimpio = titulo.replace(/[^\x00-\x7F]/g, '');
+        // 🔥 LIMPIAR TÍTULO: eliminar emojis y caracteres no ISO-8859-1
+        const tituloLimpio = titulo
+            .replace(/[^\x00-\x7F]/g, '')  // Eliminar caracteres no ASCII
+            .replace(/[^a-zA-Z0-9\s\-_]/g, '') // Eliminar emojis y símbolos
+            .substring(0, 100);
+        
+        // 🔥 LIMPIAR MENSAJE
+        const mensajeLimpio = mensaje
+            .replace(/[^\x00-\x7F]/g, '')
+            .substring(0, 500);
+        
+        console.log('📢 Título limpio:', tituloLimpio);
+        console.log('📢 Mensaje limpio:', mensajeLimpio.substring(0, 100));
         
         const response = await fetch(`https://ntfy.sh/${topic}`, {
             method: 'POST',
-            body: mensaje,
+            body: mensajeLimpio,
             headers: {
                 'Title': tituloLimpio,
                 'Priority': prioridad,
@@ -88,7 +126,8 @@ window.enviarNotificacionPush = async function(titulo, mensaje, etiquetas = 'bel
             console.log('✅ Push enviado correctamente');
             return true;
         } else {
-            console.error('❌ Error en push:', await response.text());
+            const errorText = await response.text();
+            console.error('❌ Error en push:', errorText);
             return false;
         }
     } catch (error) {
@@ -323,7 +362,7 @@ window.notificarNuevaReserva = async function(booking) {
 ⏰ Hora: ${horaFormateada}`;
 
         await window.enviarNotificacionPush(
-            `📅 ${config.nombre} - Nuevo turno`,
+            `Nueva reserva - ${config.nombre}`,
             mensajePush,
             'calendar',
             'default'
@@ -338,7 +377,7 @@ window.notificarNuevaReserva = async function(booking) {
 };
 
 // ============================================
-// NOTIFICACIÓN DE RESERVA PENDIENTE (CON ANTICIPO) - CON DATOS DE PAGO A LA DUEÑA
+// NOTIFICACIÓN DE RESERVA PENDIENTE (CON ANTICIPO)
 // ============================================
 window.notificarReservaPendiente = async function(booking) {
     try {
@@ -413,7 +452,7 @@ El turno se cancelará automáticamente si no se confirma el pago dentro de las 
 💰 Monto: $${montoAnticipo}`;
 
             await window.enviarNotificacionPush(
-                `💰 ${configNegocio.nombre} - Pago pendiente`,
+                `Pago pendiente - ${configNegocio.nombre}`,
                 mensajePush,
                 'moneybag',
                 'high'
@@ -458,7 +497,7 @@ El turno se cancelará automáticamente si no se confirma el pago dentro de las 
 💰 Estado: Pendiente de pago`;
 
         await window.enviarNotificacionPush(
-            `💰 ${config.nombre} - Pago pendiente`,
+            `Pago pendiente - ${config.nombre}`,
             mensajePush,
             'moneybag',
             'high'
@@ -548,7 +587,7 @@ Hola *${booking.cliente_nombre}*, lamentamos informarte que tu turno ha sido can
 ${canceladoPor === 'cliente' ? '🔔 Cancelado por cliente' : '🔔 Cancelado por admin'}`;
 
         await window.enviarNotificacionPush(
-            `❌ ${config.nombre} - Cancelación`,
+            `Cancelacion - ${config.nombre}`,
             mensajePush,
             'x',
             'default'
@@ -562,4 +601,4 @@ ${canceladoPor === 'cliente' ? '🔔 Cancelado por cliente' : '🔔 Cancelado po
     }
 };
 
-console.log('✅ whatsapp-helper.js - VERSIÓN GENÉRICA CARGADA (CON FORMATO EXACTO)');
+console.log('✅ whatsapp-helper.js - VERSIÓN COMPLETA CARGADA (CON DETECCIÓN DE DISPOSITIVO Y PUSH CORREGIDO)');
