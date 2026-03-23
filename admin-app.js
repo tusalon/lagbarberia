@@ -1189,22 +1189,22 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
     const days = getDaysInMonth();
     
     return (
-        <div className="min-h-screen bg-pink-50 p-3 sm:p-6">
+        <div className="min-h-screen bg-gray-100 p-3 sm:p-6">
             <div className="max-w-6xl mx-auto space-y-4">
                 
                 {/* HEADER */}
-                <div className="bg-white p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-l-4 border-pink-500">
+                <div className="bg-white p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-l-4 border-amber-600">
                     {/* Título y logo */}
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform">
+                        <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-700 rounded-xl shadow-lg flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform">
                             <span className="text-2xl text-white">
                                 {config?.especialidad?.toLowerCase().includes('uñas') ? '💅' : 
-                                 config?.especialidad?.toLowerCase().includes('pelo') ? '💇‍♀️' : '💖'}
+                                 config?.especialidad?.toLowerCase().includes('pelo') ? '💇‍♂️' : '✂️'}
                             </span>
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-pink-800">{nombreNegocio}</h1>
-                            <p className="text-xs text-pink-500">Panel de Administración</p>
+                            <h1 className="text-xl font-bold text-amber-800">{nombreNegocio}</h1>
+                            <p className="text-xs text-amber-600">Panel de Administración</p>
                         </div>
                     </div>
                     
@@ -1212,9 +1212,9 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                     <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                         <button
                             onClick={() => window.location.href = 'editar-negocio.html'}
-                            className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-pink-400 flex-1 sm:flex-none justify-center"
+                            className="flex items-center gap-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-amber-500 flex-1 sm:flex-none justify-center"
                         >
-                            <span className="text-lg">💖</span>
+                            <span className="text-lg">✂️</span>
                             <span className="font-medium">Editar Negocio</span>
                         </button>
                         
@@ -1223,26 +1223,26 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 cargarConfiguracion();
                                 setConfigVersion(prev => prev + 1);
                             }} 
-                            className="p-2 bg-pink-50 rounded-full hover:bg-pink-100 transition-all hover:scale-105 border border-pink-200"
+                            className="p-2 bg-amber-50 rounded-full hover:bg-amber-100 transition-all hover:scale-105 border border-amber-200"
                             title="Recargar datos del negocio"
                         >
-                            <i className="icon-refresh-cw text-pink-600"></i>
+                            <i className="icon-refresh-cw text-amber-600"></i>
                         </button>
                         
                         <button 
                             onClick={fetchBookings} 
-                            className="p-2 bg-pink-50 rounded-full hover:bg-pink-100 transition-all hover:scale-105 border border-pink-200"
+                            className="p-2 bg-amber-50 rounded-full hover:bg-amber-100 transition-all hover:scale-105 border border-amber-200"
                             title="Actualizar reservas"
                         >
-                            <i className="icon-refresh-cw text-pink-600"></i>
+                            <i className="icon-refresh-cw text-amber-600"></i>
                         </button>
                         
                         <button 
                             onClick={handleLogout}
-                            className="p-2 bg-pink-50 rounded-full hover:bg-pink-100 transition-all hover:scale-105 border border-pink-200"
+                            className="p-2 bg-amber-50 rounded-full hover:bg-amber-100 transition-all hover:scale-105 border border-amber-200"
                             title="Cerrar sesión"
                         >
-                            <i className="icon-log-out text-pink-600"></i>
+                            <i className="icon-log-out text-amber-600"></i>
                         </button>
                     </div>
                 </div>
@@ -1357,11 +1357,11 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                         let className = "h-10 w-full flex items-center justify-center rounded-lg text-sm font-medium transition-all relative";
                                                         
                                                         if (selected) {
-                                                            className += " bg-pink-500 text-white shadow-md ring-2 ring-pink-300";
+                                                            className += " bg-amber-600 text-white shadow-md ring-2 ring-amber-300";
                                                         } else if (!available) {
                                                             className += " text-gray-300 cursor-not-allowed bg-gray-50";
                                                         } else {
-                                                            className += " text-gray-700 hover:bg-pink-50 hover:text-pink-600 hover:scale-105 cursor-pointer";
+                                                            className += " text-gray-700 hover:bg-amber-50 hover:text-amber-600 hover:scale-105 cursor-pointer";
                                                         }
                                                         
                                                         return (
@@ -1393,7 +1393,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                         onClick={() => setNuevaReservaData({...nuevaReservaData, hora_inicio: hora})}
                                                         className={`py-2 px-3 rounded-lg text-sm font-medium transition ${
                                                             nuevaReservaData.hora_inicio === hora
-                                                                ? 'bg-pink-500 text-white'
+                                                                ? 'bg-amber-600 text-white'
                                                                 : 'bg-gray-100 hover:bg-gray-200'
                                                         }`}
                                                     >
@@ -1426,7 +1426,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                             onClick={() => setTabActivo(tab.id)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                                 tabActivo === tab.id 
-                                    ? 'bg-pink-500 text-white shadow-md scale-105' 
+                                    ? 'bg-amber-600 text-white shadow-md scale-105' 
                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                         >
@@ -1459,7 +1459,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         <div className="flex justify-end">
                             <button
                                 onClick={cargarSolicitudesPendientes}
-                                className="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-lg hover:bg-pink-200 transition"
+                                className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition"
                             >
                                 <i className="icon-refresh-cw"></i>
                                 Actualizar
@@ -1468,14 +1468,14 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         
                         {cargandoSolicitudes ? (
                             <div className="bg-white p-8 rounded-xl text-center">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
-                                <p className="text-pink-500 mt-4">Cargando solicitudes...</p>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto"></div>
+                                <p className="text-amber-600 mt-4">Cargando solicitudes...</p>
                             </div>
                         ) : solicitudesPendientes.length === 0 ? (
-                            <div className="bg-white p-8 rounded-xl text-center border border-pink-200">
+                            <div className="bg-white p-8 rounded-xl text-center border border-amber-200">
                                 <div className="text-5xl mb-4">✅</div>
-                                <p className="text-pink-600">No hay solicitudes pendientes</p>
-                                <p className="text-sm text-pink-400 mt-2">Cuando un cliente solicite registro, aparecerá aquí</p>
+                                <p className="text-amber-700">No hay solicitudes pendientes</p>
+                                <p className="text-sm text-amber-500 mt-2">Cuando un cliente solicite registro, aparecerá aquí</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
@@ -1490,28 +1490,28 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                     });
                                     
                                     return (
-                                        <div key={solicitud.id} className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-l-yellow-500 border border-pink-200">
+                                        <div key={solicitud.id} className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-l-yellow-500 border border-amber-200">
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2 mb-2">
                                                         <span className="text-2xl">👤</span>
-                                                        <h3 className="font-bold text-lg text-pink-800">{solicitud.nombre}</h3>
+                                                        <h3 className="font-bold text-lg text-amber-800">{solicitud.nombre}</h3>
                                                         <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pendiente</span>
                                                     </div>
                                                     
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mb-3">
-                                                        <div className="flex items-center gap-2 text-pink-600">
+                                                        <div className="flex items-center gap-2 text-amber-700">
                                                             <span>📱</span>
                                                             <span>{solicitud.whatsapp}</span>
                                                         </div>
-                                                        <div className="flex items-center gap-2 text-pink-600">
+                                                        <div className="flex items-center gap-2 text-amber-700">
                                                             <span>📅</span>
                                                             <span>{fechaFormateada}</span>
                                                         </div>
                                                     </div>
                                                     
                                                     {solicitud.dispositivo_info && (
-                                                        <div className="text-xs text-pink-400 bg-pink-50 p-2 rounded-lg mt-2">
+                                                        <div className="text-xs text-amber-500 bg-amber-50 p-2 rounded-lg mt-2">
                                                             <span>📱 Dispositivo: {solicitud.dispositivo_info.substring(0, 100)}</span>
                                                         </div>
                                                     )}
@@ -1565,9 +1565,9 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                 {tabActivo === 'clientes' && (userRole === 'admin' || userNivel >= 2) && (
                     <div className="space-y-4">
                         {cargandoClientes && (
-                            <div className="bg-pink-50 p-3 rounded-lg flex items-center gap-2">
-                                <div className="animate-spin h-4 w-4 border-2 border-pink-600 border-t-transparent rounded-full"></div>
-                                <span className="text-pink-600">Cargando datos...</span>
+                            <div className="bg-amber-50 p-3 rounded-lg flex items-center gap-2">
+                                <div className="animate-spin h-4 w-4 border-2 border-amber-600 border-t-transparent rounded-full"></div>
+                                <span className="text-amber-600">Cargando datos...</span>
                             </div>
                         )}
                         
@@ -1631,8 +1631,8 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                 {tabActivo === 'reservas' && (
                     <>
                         {userRole === 'profesional' && profesional && (
-                            <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
-                                <p className="text-pink-800 font-medium">
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                <p className="text-amber-800 font-medium">
                                     Hola {profesional.nombre} 👋 - Mostrando tus reservas ({filteredBookings.length})
                                 </p>
                             </div>
@@ -1641,15 +1641,15 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         <div className="bg-white p-4 rounded-xl shadow-sm space-y-3">
                             <div className="flex flex-wrap gap-3 items-center">
                                 <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" />
-                                {filterDate && <button onClick={() => setFilterDate('')} className="text-pink-500 text-sm">Limpiar filtro</button>}
+                                {filterDate && <button onClick={() => setFilterDate('')} className="text-amber-500 text-sm">Limpiar filtro</button>}
                             </div>
                             
                             <div className="flex flex-wrap gap-2 items-center">
-                                <button onClick={() => setStatusFilter('activas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'activas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Activas ({activasCount})</button>
+                                <button onClick={() => setStatusFilter('activas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'activas' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Activas ({activasCount})</button>
                                 <button onClick={() => setStatusFilter('pendientes')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'pendientes' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Pendientes ({pendientesCount})</button>
-                                <button onClick={() => setStatusFilter('completadas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'completadas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Completadas ({completadasCount})</button>
-                                <button onClick={() => setStatusFilter('canceladas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'canceladas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Canceladas ({canceladasCount})</button>
-                                <button onClick={() => setStatusFilter('todas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'todas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Todas ({bookings.length})</button>
+                                <button onClick={() => setStatusFilter('completadas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'completadas' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Completadas ({completadasCount})</button>
+                                <button onClick={() => setStatusFilter('canceladas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'canceladas' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Canceladas ({canceladasCount})</button>
+                                <button onClick={() => setStatusFilter('todas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'todas' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Todas ({bookings.length})</button>
                                 
                                 {/* 🔥 BOTÓN PARA BORRAR CANCELADAS - SOLO EN PESTAÑA CANCELADAS */}
                                 {statusFilter === 'canceladas' && (
@@ -1667,8 +1667,8 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         
                         {loading ? (
                             <div className="text-center py-12">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-                                <p className="text-pink-500 mt-4">Cargando reservas...</p>
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
+                                <p className="text-amber-500 mt-4">Cargando reservas...</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
@@ -1679,24 +1679,24 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 ) : (
                                     filteredBookings.map(b => (
                                         <div key={b.id} className={`bg-white p-4 rounded-xl shadow-sm border-l-4 ${
-                                            b.estado === 'Reservado' ? 'border-l-pink-500' :
+                                            b.estado === 'Reservado' ? 'border-l-amber-600' :
                                             b.estado === 'Pendiente' ? 'border-l-yellow-500' :
                                             b.estado === 'Completado' ? 'border-l-green-500' :
                                             'border-l-red-500'
                                         }`}>
                                             <div className="flex justify-between mb-2">
                                                 <span className="font-semibold">{window.formatFechaCompleta ? window.formatFechaCompleta(b.fecha) : b.fecha}</span>
-                                                <span className="text-sm bg-pink-100 text-pink-700 px-2 py-1 rounded-full">{formatTo12Hour(b.hora_inicio)}</span>
+                                                <span className="text-sm bg-amber-100 text-amber-700 px-2 py-1 rounded-full">{formatTo12Hour(b.hora_inicio)}</span>
                                             </div>
                                             <div className="text-sm space-y-1">
                                                 <p><span className="font-medium">👤 Cliente:</span> {b.cliente_nombre}</p>
                                                 <p><span className="font-medium">📱 WhatsApp:</span> {b.cliente_whatsapp}</p>
                                                 <p><span className="font-medium">💈 Servicio:</span> {b.servicio}</p>
-                                                <p><span className="font-medium">👩‍🎨 Profesional:</span> {b.profesional_nombre || b.trabajador_nombre}</p>
+                                                <p><span className="font-medium">👨‍🎨 Profesional:</span> {b.profesional_nombre || b.trabajador_nombre}</p>
                                             </div>
                                             <div className="flex justify-between items-center mt-3 pt-2 border-t">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold
-                                                    ${b.estado === 'Reservado' ? 'bg-pink-100 text-pink-700' : 
+                                                    ${b.estado === 'Reservado' ? 'bg-amber-100 text-amber-700' : 
                                                       b.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700' :
                                                       b.estado === 'Completado' ? 'bg-green-100 text-green-700' : 
                                                       'bg-red-100 text-red-700'}`}>

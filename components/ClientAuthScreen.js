@@ -25,11 +25,14 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
         };
         cargarDatos();
 
-        // Precargar la imagen de fondo
+        // Precargar la imagen de fondo (LAG Barberia)
         const img = new Image();
-        img.src = 'https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=2071&auto=format&fit=crop';
+        img.src = '/lag-barberia/images/LAG.barberia.jpg';
         img.onload = () => setImagenCargada(true);
-        img.onerror = () => setImagenCargada(true);
+        img.onerror = () => {
+            console.error('❌ Error cargando imagen de fondo, usando fallback');
+            setImagenCargada(true);
+        };
     }, []);
 
     // ============================================
@@ -53,28 +56,24 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
         const numeroCompleto = `53${numeroLimpio}`;
         
         try {
-            // 🔥 VERIFICAR SI ES ADMIN (DUEÑO) - VERSIÓN CORREGIDA DEFINITIVA
+            // VERIFICAR SI ES ADMIN (DUEÑO)
             if (numeroLimpio === config?.telefono?.replace(/\D/g, '')) {
-                console.log('👑 Número de administradora detectado');
+                console.log('👑 Número de administrador detectado');
                 
-                // 🔥 OBTENER EL NEGOCIO_ID CORRECTO
                 const negocioId = window.NEGOCIO_ID_POR_DEFECTO || 
                                   (typeof window.getNegocioId === 'function' ? 
                                    window.getNegocioId() : 
                                    '47666c9b-afa1-4286-a727-0e30f86611af');
                 
-                // 🔥 LIMPIAR CUALQUIER ID ANTERIOR
                 localStorage.removeItem('negocioId');
                 localStorage.removeItem('negocioNombre');
                 
-                // 🔥 GUARDAR EL ID CORRECTO
                 localStorage.setItem('negocioId', negocioId);
                 localStorage.setItem('negocioNombre', config?.nombre || 'Negocio de Prueba');
                 
                 console.log('✅ negocioId guardado en localStorage:', negocioId);
                 console.log('✅ negocioNombre guardado:', config?.nombre);
                 
-                // Verificar si ya tiene sesión activa
                 const loginTime = localStorage.getItem('adminLoginTime');
                 const tieneSesion = loginTime && (Date.now() - parseInt(loginTime)) < 8 * 60 * 60 * 1000;
                 
@@ -125,7 +124,6 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                 if (estado === 'pendiente') {
                     setSolicitudEnviada(true);
                 } else if (estado === 'rechazado') {
-                    // Si fue rechazado, se puede volver a solicitar
                     setSolicitudEnviada(false);
                     setEstadoSolicitud(null);
                 } else {
@@ -156,7 +154,6 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
             return;
         }
         
-        // Si es admin o profesional, no hacer nada (ya tienen su flujo)
         if (esAdmin || esProfesional) {
             return;
         }
@@ -168,13 +165,11 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
         const numeroCompleto = `53${numeroLimpio}`;
         
         try {
-            // 🔥 PASO 1: Verificar si ya es cliente autorizado
             console.log('🔍 Verificando si es cliente autorizado...');
             const autorizado = await window.verificarAccesoCliente(numeroCompleto);
             
             if (autorizado) {
                 console.log('✅ Cliente autorizado, acceso directo');
-                // Guardar negocioId en localStorage
                 const negocioId = window.NEGOCIO_ID_POR_DEFECTO || 
                                   (typeof window.getNegocioId === 'function' ? 
                                    window.getNegocioId() : null);
@@ -186,7 +181,6 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                 return;
             }
             
-            // 🔥 PASO 2: Verificar si tiene solicitud pendiente
             console.log('🔍 Verificando estado de solicitud...');
             const estado = await window.obtenerEstadoSolicitud(numeroLimpio);
             
@@ -196,12 +190,10 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                 return;
             }
             
-            // 🔥 PASO 3: Enviar nueva solicitud (borra automáticamente anteriores)
             console.log('📝 Enviando nueva solicitud...');
             const resultado = await window.solicitarRegistroCliente(nombre, numeroLimpio);
             
             if (resultado.success && resultado.yaAutorizado) {
-                // Caso raro: ya era autorizado (doble check)
                 console.log('✅ Cliente ya autorizado (doble check)');
                 onAccessGranted(resultado.cliente.nombre, numeroCompleto);
             } else if (resultado.success) {
@@ -209,7 +201,6 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                 setError('✅ Solicitud enviada correctamente. Recibirás confirmación cuando sea aprobada.');
                 setNombre('');
                 setWhatsapp('');
-                // No redirigir, solo mostrar mensaje de éxito
             } else {
                 setError('❌ Error al enviar la solicitud. Intentá más tarde.');
             }
@@ -230,7 +221,6 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
             const numeroLimpio = whatsapp.replace(/\D/g, '');
             const numeroCompleto = `53${numeroLimpio}`;
             
-            // 🔥 OBTENER EL ID DESDE CONFIG-NEGOCIO.JS
             const negocioId = window.NEGOCIO_ID_POR_DEFECTO || 
                               (typeof window.getNegocioId === 'function' ? 
                                window.getNegocioId() : 
@@ -238,7 +228,6 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
             
             localStorage.setItem('negocioId', negocioId);
             
-            // También guardar nombre para el header
             if (config) {
                 localStorage.setItem('negocioNombre', config.nombre);
             }
@@ -251,36 +240,36 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
 
     if (cargando || !imagenCargada) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 to-pink-200">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-100 to-amber-200">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
             </div>
         );
     }
 
-    const colorPrimario = config?.color_primario || '#ec4899';
-    const nombreNegocio = config?.nombre || 'Mi Salón';
-    const sticker = config?.especialidad?.toLowerCase().includes('uñas') ? '💅' : 
-                    config?.especialidad?.toLowerCase().includes('pelo') ? '💇‍♀️' : 
-                    config?.especialidad?.toLowerCase().includes('belleza') ? '🌸' : '💖';
+    const colorPrimario = config?.color_primario || '#c49b63';
+    const nombreNegocio = config?.nombre || 'LAG Barberia';
+    const sticker = config?.especialidad?.toLowerCase().includes('barberia') ? '✂️' : 
+                    config?.especialidad?.toLowerCase().includes('corte') ? '💈' : 
+                    config?.especialidad?.toLowerCase().includes('barba') ? '🧔' : '✂️';
     const logoUrl = config?.logo_url;
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Imagen de fondo */}
+            {/* Imagen de fondo - LAG BARBERIA */}
             <div className="absolute inset-0 z-0">
                 <img 
-                    src="https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=2071&auto=format&fit=crop" 
-                    alt="Fondo de salón" 
+                    src="/lag-barberia/images/LAG.barberia.jpg"
+                    alt="LAG Barberia" 
                     className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/40"></div>
+                <div className="absolute inset-0 bg-black/50"></div>
             </div>
 
             {/* Botón volver */}
             {onGoBack && (
                 <button
                     onClick={onGoBack}
-                    className="absolute top-4 left-4 z-20 w-10 h-10 bg-pink-500/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors border border-pink-300"
+                    className="absolute top-4 left-4 z-20 w-10 h-10 bg-amber-600/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-amber-700 transition-colors border border-amber-400"
                     title="Volver"
                 >
                     <i className="icon-arrow-left text-white text-xl"></i>
@@ -288,28 +277,28 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
             )}
 
             <div className="relative z-10 max-w-md w-full mx-auto">
-                <div className="bg-white/20 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-pink-300/50">
+                <div className="bg-black/40 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-amber-500/50">
                     {/* Logo o sticker */}
                     <div className="text-center mb-6">
                         {logoUrl ? (
                             <img 
                                 src={logoUrl} 
                                 alt={nombreNegocio} 
-                                className="w-20 h-20 object-contain mx-auto rounded-xl ring-4 ring-pink-300/50"
+                                className="w-20 h-20 object-contain mx-auto rounded-xl ring-4 ring-amber-500/50"
                             />
                         ) : (
-                            <div className="w-20 h-20 rounded-xl mx-auto flex items-center justify-center bg-pink-500 ring-4 ring-pink-300/50">
+                            <div className="w-20 h-20 rounded-xl mx-auto flex items-center justify-center bg-amber-600 ring-4 ring-amber-500/50">
                                 <span className="text-3xl">{sticker}</span>
                             </div>
                         )}
                         <h1 className="text-3xl font-bold text-white mt-4">{nombreNegocio}</h1>
-                        <p className="text-pink-300 mt-1">🌸 Espacio de belleza y cuidado 🌸</p>
+                        <p className="text-amber-300 mt-1">✂️ Espacio de barbería y estilo ✂️</p>
                     </div>
 
-                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center justify-center gap-2 bg-pink-500/30 p-3 rounded-lg">
-                        <span>💖</span>
+                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center justify-center gap-2 bg-amber-600/30 p-3 rounded-lg">
+                        <span>✂️</span>
                         Ingresá con tu número
-                        <span>💖</span>
+                        <span>⚡</span>
                     </h2>
                     
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -322,10 +311,10 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                 type="text"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
-                                className={`w-full px-4 py-3 rounded-lg border border-pink-300/30 bg-white/10 text-white placeholder-pink-200/70 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition ${
+                                className={`w-full px-4 py-3 rounded-lg border border-amber-400/30 bg-white/10 text-white placeholder-amber-200/70 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition ${
                                     esAdmin || esProfesional || solicitudEnviada ? 'opacity-60 cursor-not-allowed' : ''
                                 }`}
-                                placeholder="Ej: María Pérez"
+                                placeholder="Ej: Juan Pérez"
                                 disabled={esAdmin || esProfesional || solicitudEnviada}
                             />
                         </div>
@@ -336,7 +325,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                 Tu WhatsApp
                             </label>
                             <div className="flex">
-                                <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-pink-300/30 bg-white/10 text-pink-300 text-sm">
+                                <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-amber-400/30 bg-white/10 text-amber-300 text-sm">
                                     +53
                                 </span>
                                 <input
@@ -347,7 +336,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                         setWhatsapp(value);
                                         verificarNumero(value);
                                     }}
-                                    className={`w-full px-4 py-3 rounded-r-lg border border-pink-300/30 bg-white/10 text-white placeholder-pink-200/70 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition ${
+                                    className={`w-full px-4 py-3 rounded-r-lg border border-amber-400/30 bg-white/10 text-white placeholder-amber-200/70 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition ${
                                         esAdmin || esProfesional || solicitudEnviada ? 'opacity-60 cursor-not-allowed' : ''
                                     }`}
                                     placeholder="51234567"
@@ -355,31 +344,31 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                     disabled={esAdmin || esProfesional || solicitudEnviada}
                                 />
                             </div>
-                            <p className="text-xs text-pink-300/70 mt-1">
+                            <p className="text-xs text-amber-300/70 mt-1">
                                 Ingresá tu número de WhatsApp (8 dígitos después del +53)
                             </p>
                         </div>
 
                         {/* Indicador de verificación */}
                         {verificando && (
-                            <div className="text-pink-300 text-sm bg-pink-500/20 p-2 rounded-lg flex items-center gap-2 border border-pink-300/30">
-                                <div className="animate-spin h-4 w-4 border-2 border-pink-300 border-t-transparent rounded-full"></div>
+                            <div className="text-amber-300 text-sm bg-amber-600/20 p-2 rounded-lg flex items-center gap-2 border border-amber-400/30">
+                                <div className="animate-spin h-4 w-4 border-2 border-amber-300 border-t-transparent rounded-full"></div>
                                 Verificando...
                             </div>
                         )}
 
                         {/* Mensajes según el rol detectado */}
                         {esAdmin && !verificando && (
-                            <div className="bg-pink-500/30 border border-pink-300/50 rounded-lg p-4">
+                            <div className="bg-amber-600/30 border border-amber-500/50 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                                    <div className="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                                         A
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-white font-bold text-xl">
-                                            ¡Bienvenida Administradora!
+                                            ¡Bienvenido Administrador!
                                         </p>
-                                        <p className="text-pink-200 text-sm">
+                                        <p className="text-amber-200 text-sm">
                                             Hacé clic en el botón de abajo para acceder al panel.
                                         </p>
                                     </div>
@@ -388,16 +377,16 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                         )}
 
                         {esProfesional && profesionalInfo && !verificando && (
-                            <div className="bg-pink-500/30 border border-pink-300/50 rounded-lg p-4">
+                            <div className="bg-amber-600/30 border border-amber-500/50 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                                    <div className="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                                         P
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-white font-bold text-xl">
                                             ¡Hola {profesionalInfo.nombre}!
                                         </p>
-                                        <p className="text-pink-200 text-sm">
+                                        <p className="text-amber-200 text-sm">
                                             Hacé clic en el botón de abajo para acceder a tu panel.
                                         </p>
                                     </div>
@@ -407,9 +396,9 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
 
                         {/* Mensaje de solicitud pendiente */}
                         {solicitudEnviada && !verificando && !esAdmin && !esProfesional && (
-                            <div className="bg-yellow-500/30 border border-yellow-500/50 rounded-lg p-4">
+                            <div className="bg-yellow-600/30 border border-yellow-500/50 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                                    <div className="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                                         ⏳
                                     </div>
                                     <div className="flex-1">
@@ -426,9 +415,9 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
 
                         {/* Mensaje de cliente autorizado */}
                         {clienteAutorizado && !verificando && !esAdmin && !esProfesional && (
-                            <div className="bg-green-500/30 border border-green-500/30 rounded-lg p-4">
+                            <div className="bg-green-600/30 border border-green-500/30 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                                    <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                                         C
                                     </div>
                                     <div className="flex-1">
@@ -458,14 +447,14 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                     type="button"
                                     onClick={() => {
                                         localStorage.setItem('adminAuth', 'true');
-                                        localStorage.setItem('adminUser', 'Administradora');
+                                        localStorage.setItem('adminUser', 'Administrador');
                                         localStorage.setItem('adminLoginTime', Date.now());
                                         window.location.href = 'admin.html';
                                     }}
-                                    className="w-full bg-white text-pink-600 py-4 rounded-xl font-bold hover:bg-pink-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-pink-300"
+                                    className="w-full bg-white text-amber-700 py-4 rounded-xl font-bold hover:bg-amber-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-amber-400"
                                 >
                                     <span className="text-xl">⚡</span>
-                                    Ingresar como Administradora
+                                    Ingresar como Administrador
                                 </button>
                             )}
 
@@ -481,7 +470,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                         }));
                                         window.location.href = 'admin.html';
                                     }}
-                                    className="w-full bg-white text-pink-600 py-4 rounded-xl font-bold hover:bg-pink-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-pink-300"
+                                    className="w-full bg-white text-amber-700 py-4 rounded-xl font-bold hover:bg-amber-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-amber-400"
                                 >
                                     <span className="text-xl">✂️</span>
                                     Ingresar como Profesional
@@ -492,7 +481,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                 <button
                                     type="button"
                                     onClick={handleAccesoDirecto}
-                                    className="w-full bg-white text-pink-600 py-4 rounded-xl font-bold hover:bg-pink-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-pink-300"
+                                    className="w-full bg-white text-amber-700 py-4 rounded-xl font-bold hover:bg-amber-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-amber-400"
                                 >
                                     <span className="text-xl">📱</span>
                                     Ingresar como Cliente
@@ -503,16 +492,16 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                 <button
                                     type="submit"
                                     disabled={verificando}
-                                    className="w-full bg-pink-500 text-white py-4 rounded-xl font-bold hover:bg-pink-600 transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-pink-300"
+                                    className="w-full bg-amber-600 text-white py-4 rounded-xl font-bold hover:bg-amber-700 transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-amber-400"
                                 >
-                                    <span className="text-xl">💅</span>
+                                    <span className="text-xl">✂️</span>
                                     {verificando ? 'Verificando...' : 'Enviar Solicitud de Registro'}
-                                    <span className="text-xl">✨</span>
+                                    <span className="text-xl">⚡</span>
                                 </button>
                             )}
 
                             {solicitudEnviada && !verificando && !esAdmin && !esProfesional && (
-                                <div className="text-center text-white/80 text-sm bg-pink-500/20 p-3 rounded-lg">
+                                <div className="text-center text-white/80 text-sm bg-amber-600/20 p-3 rounded-lg">
                                     <p>✅ Solicitud enviada</p>
                                     <p className="text-xs mt-1">Te avisaremos cuando sea aprobada</p>
                                 </div>
@@ -521,9 +510,9 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                     </form>
 
                     {/* Stickers decorativos flotantes */}
-                    <div className="absolute -bottom-6 -right-6 text-7xl opacity-20 rotate-12 select-none">💇‍♀️</div>
-                    <div className="absolute -top-6 -left-6 text-7xl opacity-20 -rotate-12 select-none">💅</div>
-                    <div className="absolute top-1/2 -translate-y-1/2 -right-8 text-5xl opacity-10 select-none">🌸</div>
+                    <div className="absolute -bottom-6 -right-6 text-7xl opacity-20 rotate-12 select-none">✂️</div>
+                    <div className="absolute -top-6 -left-6 text-7xl opacity-20 -rotate-12 select-none">💈</div>
+                    <div className="absolute top-1/2 -translate-y-1/2 -right-8 text-5xl opacity-10 select-none">⚡</div>
                 </div>
             </div>
         </div>
