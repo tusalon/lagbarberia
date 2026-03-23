@@ -16,7 +16,7 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
 
         // Precargar la imagen de fondo (LAG Barberia)
         const img = new Image();
-        src="/images/LAG.barberia.jpg"
+        img.src = "/lag-barberia/images/LAG.barberia.jpg";
         img.onload = () => setImagenCargada(true);
         img.onerror = () => {
             console.error('❌ Error cargando imagen de fondo, usando fallback');
@@ -106,6 +106,11 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
                     src="/lag-barberia/images/LAG.barberia.jpg"
                     alt="LAG Barberia" 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                        console.error('❌ Error cargando imagen, usando fallback');
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1585747860714-2ba6b8d6c5c9?q=80&w=2070&auto=format&fit=crop';
+                    }}
                 />
                 <div className="absolute inset-0 bg-black/50"></div>
             </div>
