@@ -1,6 +1,6 @@
 // utils/servicios.js - Gestión de servicios (CORREGIDO)
 
-console.log('💅 servicios.js cargado (modo Supabase)');
+console.log('✂️ servicios.js cargado (modo Supabase)');
 
 // Helper para obtener negocio_id - SIN RECURSIÓN
 function getNegocioId() {

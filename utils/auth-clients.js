@@ -576,7 +576,7 @@ Ya podés reservar turnos en *${nombreNegocio}*.
 
 📱 Ingresá con tu número: ${solicitud.whatsapp}
 
-¡Te esperamos! 💖`;
+¡Te esperamos! 🔥`;
 
         if (window.enviarWhatsApp) {
             window.enviarWhatsApp(solicitud.whatsapp, mensajeCliente);

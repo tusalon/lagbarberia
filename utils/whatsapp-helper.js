@@ -390,7 +390,7 @@ window.notificarReservaPendiente = async function(booking) {
         }
         
         const mensajeWhatsApp = 
-`💅 RESERVA PENDIENTE DE PAGO - ${config.nombre}
+`✂️ RESERVA PENDIENTE DE PAGO - ${config.nombre}
 
 Cliente: ${booking.cliente_nombre}
 WhatsApp: ${booking.cliente_whatsapp}
@@ -450,7 +450,7 @@ window.enviarConfirmacionPago = async function(booking, configNegocio) {
         const nombreNegocio = configNegocio?.nombre || 'Mi Salon';
 
         const mensajeConfirmacion = 
-`💅 ${nombreNegocio} - Turno Confirmado 🎉
+`✂️ ${nombreNegocio} - Turno Confirmado 🎉
 
 Hola ${booking.cliente_nombre}, tu turno ha sido CONFIRMADO!
 

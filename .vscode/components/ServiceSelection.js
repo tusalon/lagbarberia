@@ -2,10 +2,10 @@
 
 function ServiceSelection({ onSelect, selectedService }) {
     const services = [
-        { id: 1, name: "💅 Esmaltado semipermanente manos y pies", duration: 60 },
+        { id: 1, name: "✂️ Esmaltado semipermanente manos y pies", duration: 60 },
         { id: 2, name: "✨ Refill en manos", duration: 90 },
         { id: 3, name: "🦶 Refill y pedicura", duration: 120 },
-        { id: 4, name: "🌸 Refill manos y pedicura con parafina", duration: 180 },
+        { id: 4, name: "💈 Refill manos y pedicura con parafina", duration: 180 },
         { id: 5, name: "👣 Pedicura solo", duration: 30 },
     ];
 

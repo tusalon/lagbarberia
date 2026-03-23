@@ -194,7 +194,7 @@ function ProfesionalForm({ profesional, onGuardar, onCancelar }) {
         avatar: '👤'
     });
 
-    const avatares = ['👤', '💇', '💅', '👑', '⭐', '🔰'];
+    const avatares = ['👤', '💇', '✂️', '👑', '⭐', '🔰'];
     const colores = [
         { value: 'bg-amber-600', label: 'Ámbar' },
         { value: 'bg-amber-700', label: 'Ámbar Oscuro' },
