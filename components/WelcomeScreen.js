@@ -106,7 +106,7 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
             {/* Imagen de fondo fija - LAG BARBERIA */}
             <div className="fixed inset-0 z-0">
                 <img 
-                    src="/lag-barberia/images/LAG.barberia.png"
+                    src="/lagbarberia/images/LAG.barberia.png"
                     alt="LAG Barberia" 
                     className="w-full h-full object-cover"
                     onError={(e) => {
