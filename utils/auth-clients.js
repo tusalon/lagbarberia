@@ -444,15 +444,12 @@ window.solicitarRegistroCliente = async function(nombre, whatsapp) {
         });
         
         const mensajeWhatsApp = 
-`🆕 *NUEVA SOLICITUD DE REGISTRO*
+`🆕 NUEVA SOLICITUD DE REGISTRO
 
-👤 *Nombre:* ${nombre}
-📱 *WhatsApp:* +${numeroCompleto}
-🏢 *Negocio:* ${configNegocio?.nombre || 'Mi Negocio'}
-📅 *Fecha:* ${fechaFormateada}
-
-✅ Ingresá al panel para aprobar o rechazar
-🔗 ${window.location.origin}/acrika-nails/admin.html`;
+Nombre: ${nombre}
+WhatsApp: +${numeroCompleto}
+Negocio: ${configNegocio?.nombre || 'Mi Negocio'}
+Fecha: ${fechaFormateada}`;
 
         // Enviar WhatsApp al admin
         if (window.enviarWhatsApp) {
@@ -461,14 +458,21 @@ window.solicitarRegistroCliente = async function(nombre, whatsapp) {
             console.warn('⚠️ window.enviarWhatsApp no disponible');
         }
         
-        // Enviar push notification
+        // Enviar push notification (con strings limpiados)
         if (window.enviarNotificacionPush) {
+            const tituloPush = `Nueva solicitud - ${nombre}`;
+            const mensajePush = `Cliente: ${nombre} WhatsApp: +${numeroCompleto} Negocio: ${configNegocio?.nombre || 'Mi Negocio'}`;
+            
+            console.log('📢 Enviando push notification con:', { tituloPush, mensajePush });
+            
             await window.enviarNotificacionPush(
-                `🆕 Nueva solicitud - ${nombre}`,
-                `👤 Cliente: ${nombre}\n📱 WhatsApp: +${numeroCompleto}\n🏢 ${configNegocio?.nombre || 'Mi Negocio'}`,
-                '👤',
+                tituloPush,
+                mensajePush,
+                'bell',
                 'high'
             );
+        } else {
+            console.warn('⚠️ window.enviarNotificacionPush no disponible');
         }
         
         console.log('✅ Solicitud enviada y admin notificado');
@@ -570,13 +574,13 @@ window.aprobarSolicitudCliente = async function(solicitud) {
         const nombreNegocio = configNegocio?.nombre || 'nuestro salón';
         
         const mensajeCliente = 
-`✅ *¡FELICITACIONES!* Tu solicitud fue APROBADA.
+`✅ FELICITACIONES! Tu solicitud fue APROBADA.
 
-Ya podés reservar turnos en *${nombreNegocio}*.
+Ya podes reservar turnos en ${nombreNegocio}.
 
-📱 Ingresá con tu número: ${solicitud.whatsapp}
+Ingresa con tu numero: ${solicitud.whatsapp}
 
-¡Te esperamos! 🔥`;
+Te esperamos!`;
 
         if (window.enviarWhatsApp) {
             window.enviarWhatsApp(solicitud.whatsapp, mensajeCliente);

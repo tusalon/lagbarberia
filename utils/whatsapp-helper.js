@@ -1,5 +1,6 @@
 // utils/whatsapp-helper.js - VERSIÓN GENÉRICA COMPLETA
 // CORREGIDA: Push notification, WhatsApp en móvil/PC, cancelaciones
+// CORREGIDA: Limpieza de caracteres para ntfy.sh (ISO-8859-1)
 
 console.log('📱 whatsapp-helper.js - VERSIÓN CORREGIDA');
 
@@ -12,24 +13,17 @@ async function getConfigNegocio() {
         return {
             nombre: config?.nombre || 'Mi Negocio',
             telefono: config?.telefono || '00000000',
-            ntfyTopic: config?.ntfy_topic || 'notificaciones'
+            ntfyTopic: config?.ntfy_topic || 'lag-barberia'
         };
     } catch (error) {
         console.error('Error obteniendo configuración:', error);
         return {
             nombre: 'Mi Negocio',
             telefono: '00000000',
-            ntfyTopic: 'notificaciones'
+            ntfyTopic: 'lag-barberia'
         };
     }
 }
-
-// ============================================
-// DETECTOR DE DISPOSITIVO MÓVIL
-// ============================================
-window.esMobile = function() {
-    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-};
 
 // ============================================
 // FUNCIÓN PARA LIMPIAR CARACTERES NO ISO-8859-1
@@ -44,6 +38,13 @@ function limpiarISO88591(texto) {
         .replace(/\s+/g, ' ')  // Múltiples espacios a uno solo
         .trim();
 }
+
+// ============================================
+// DETECTOR DE DISPOSITIVO MÓVIL
+// ============================================
+window.esMobile = function() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+};
 
 // ============================================
 // FUNCIÓN UNIVERSAL WHATSAPP (CORREGIDA)
@@ -163,10 +164,7 @@ window.notificarNuevaSolicitud = async function(nombre, whatsapp, negocioNombre)
 Nombre: ${nombre}
 WhatsApp: +${whatsapp}
 Negocio: ${negocioNombre || config.nombre}
-Fecha: ${fechaFormateada}
-
-Ingresa al panel para aprobar o rechazar
-${window.location.origin}/acrika-nails/admin.html`;
+Fecha: ${fechaFormateada}`;
 
         window.enviarWhatsApp(telefonoAdmin, mensajeWhatsApp);
         
@@ -174,7 +172,7 @@ ${window.location.origin}/acrika-nails/admin.html`;
         await window.enviarNotificacionPush(
             `Nueva solicitud - ${nombre}`,
             mensajePush,
-            '👤',
+            'bell',
             'high'
         );
         
@@ -390,7 +388,7 @@ window.notificarReservaPendiente = async function(booking) {
         }
         
         const mensajeWhatsApp = 
-`✂️ RESERVA PENDIENTE DE PAGO - ${config.nombre}
+`💅 RESERVA PENDIENTE DE PAGO - ${config.nombre}
 
 Cliente: ${booking.cliente_nombre}
 WhatsApp: ${booking.cliente_whatsapp}
@@ -450,7 +448,7 @@ window.enviarConfirmacionPago = async function(booking, configNegocio) {
         const nombreNegocio = configNegocio?.nombre || 'Mi Salon';
 
         const mensajeConfirmacion = 
-`✂️ ${nombreNegocio} - Turno Confirmado 🎉
+`💅 ${nombreNegocio} - Turno Confirmado 🎉
 
 Hola ${booking.cliente_nombre}, tu turno ha sido CONFIRMADO!
 

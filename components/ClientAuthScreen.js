@@ -27,8 +27,11 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
 
         // Precargar la imagen de fondo (LAG Barberia)
         const img = new Image();
-        img.src = "/lag-barberia/images/LAG.barberia.jpg";
-        img.onload = () => setImagenCargada(true);
+        img.src = "/lag-barberia/images/LAG.barberia.png";
+        img.onload = () => {
+            console.log('✅ Imagen de fondo cargada correctamente');
+            setImagenCargada(true);
+        };
         img.onerror = () => {
             console.error('❌ Error cargando imagen de fondo, usando fallback');
             setImagenCargada(true);
@@ -258,7 +261,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
             {/* Imagen de fondo - LAG BARBERIA */}
             <div className="absolute inset-0 z-0">
                 <img 
-                    src="/lag-barberia/images/LAG.barberia.jpg"
+                    src="/lag-barberia/images/LAG.barberia.png"
                     alt="LAG Barberia" 
                     className="w-full h-full object-cover"
                     onError={(e) => {
