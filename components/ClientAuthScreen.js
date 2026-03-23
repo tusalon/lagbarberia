@@ -27,7 +27,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
 
         // Precargar la imagen de fondo (LAG Barberia)
         const img = new Image();
-        img.src = "/lag-barberia/images/LAG.barberia.png";
+       img.src = "/lagbarberia/images/LAG.barberia.png";
         img.onload = () => {
             console.log('✅ Imagen de fondo cargada correctamente');
             setImagenCargada(true);
