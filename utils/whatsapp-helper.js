@@ -48,7 +48,7 @@ window.esMobile = function() {
 };
 
 // ============================================
-// FUNCIÓN UNIVERSAL WHATSAPP (OPTIMIZADA PARA WHATSAPP BUSINESS)
+// FUNCIÓN UNIVERSAL WHATSAPP (USA https://wa.me/)
 // ============================================
 window.enviarWhatsApp = function(telefono, mensaje) {
     try {
@@ -67,70 +67,26 @@ window.enviarWhatsApp = function(telefono, mensaje) {
         // Codificar el mensaje
         const mensajeCodificado = encodeURIComponent(mensaje);
         
-        // Detectar si es dispositivo móvil
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        const isAndroid = /Android/i.test(navigator.userAgent);
+        // Usar URL oficial de WhatsApp (funciona con WhatsApp Business)
+        const url = `https://wa.me/${numeroCompleto}?text=${mensajeCodificado}`;
         
-        console.log('📱 Dispositivo:', isMobile ? (isAndroid ? 'Android' : 'iOS') : 'PC');
+        console.log('🔗 URL de WhatsApp:', url);
         
-        // Múltiples URLs para probar (orden de prioridad)
-        const urls = [];
+        // Intentar abrir en una nueva pestaña/ventana
+        const ventana = window.open(url, '_blank');
         
-        if (isMobile) {
-            // En móvil: priorizar esquemas de app
-            if (isAndroid) {
-                // Para Android: usar intent de WhatsApp Business si está disponible
-                urls.push(`intent://send/${numeroCompleto}?text=${mensajeCodificado}#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end`);
-                urls.push(`intent://send/${numeroCompleto}?text=${mensajeCodificado}#Intent;scheme=whatsapp;package=com.whatsapp;end`);
-            } else {
-                // iOS: usar esquema whatsapp://
-                urls.push(`whatsapp://send?phone=${numeroCompleto}&text=${mensajeCodificado}`);
-            }
-            // Fallback para móvil
-            urls.push(`https://wa.me/${numeroCompleto}?text=${mensajeCodificado}`);
-        } else {
-            // En PC: usar WhatsApp Web
-            urls.push(`https://web.whatsapp.com/send?phone=${numeroCompleto}&text=${mensajeCodificado}`);
-            urls.push(`https://wa.me/${numeroCompleto}?text=${mensajeCodificado}`);
-        }
-        
-        // Intentar abrir cada URL hasta que una funcione
-        let urlAbierta = false;
-        
-        for (let i = 0; i < urls.length; i++) {
-            const url = urls[i];
-            console.log(`🔗 Intentando (${i + 1}/${urls.length}): ${url.substring(0, 80)}...`);
+        // Verificar si se pudo abrir
+        if (!ventana || ventana.closed || typeof ventana.closed === 'undefined') {
+            console.warn('⚠️ No se pudo abrir ventana, usando método alternativo');
             
-            try {
-                const ventana = window.open(url, '_blank');
-                
-                // En Android, a veces el intent abre la app pero también deja una ventana en blanco
-                if (isAndroid && i === 0 && ventana) {
-                    // Cerrar la ventana en blanco después de 500ms
-                    setTimeout(() => {
-                        if (ventana && !ventana.closed) {
-                            ventana.close();
-                            console.log('🗑️ Ventana en blanco cerrada');
-                        }
-                    }, 500);
-                }
-                
-                urlAbierta = true;
-                console.log(`✅ WhatsApp abierto con método ${i + 1}`);
-                break;
-                
-            } catch (e) {
-                console.warn(`⚠️ Error con método ${i + 1}:`, e.message);
-            }
-        }
-        
-        if (!urlAbierta) {
-            console.error('❌ No se pudo abrir WhatsApp');
-            
-            // Último recurso: mostrar el número para copiar
-            const mensajeUsuario = `📱 No se pudo abrir WhatsApp automáticamente.\n\nContacto: +${numeroCompleto}\n\nMensaje: ${mensaje.substring(0, 100)}...\n\nPor favor, abre WhatsApp y pega este número.`;
-            alert(mensajeUsuario);
-            return false;
+            // Método alternativo: crear un enlace temporal
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
         
         return true;
@@ -138,7 +94,7 @@ window.enviarWhatsApp = function(telefono, mensaje) {
     } catch (error) {
         console.error('❌ Error en enviarWhatsApp:', error);
         
-        // Fallback: mostrar el número
+        // Fallback: mostrar el número en una alerta
         const telefonoLimpio = telefono.toString().replace(/\D/g, '');
         let numeroCompleto = telefonoLimpio;
         if (!numeroCompleto.startsWith('53') && numeroCompleto.length === 8) {
@@ -149,6 +105,7 @@ window.enviarWhatsApp = function(telefono, mensaje) {
         return false;
     }
 };
+
 // ============================================
 // FUNCIÓN PARA ENVIAR NOTIFICACIÓN PUSH (CORREGIDA)
 // ============================================
