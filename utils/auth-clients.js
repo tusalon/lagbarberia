@@ -25,7 +25,6 @@ window.verificarAccesoCliente = async function(whatsapp) {
         const negocioId = getNegocioId();
         console.log('🔍 Verificando acceso para:', whatsapp, 'negocio:', negocioId);
         
-        // Buscar si ya existe como cliente autorizado
         const response = await fetch(
             `${window.SUPABASE_URL}/rest/v1/clientes_autorizados?negocio_id=eq.${negocioId}&whatsapp=eq.${whatsapp}&select=*`,
             {
@@ -44,7 +43,6 @@ window.verificarAccesoCliente = async function(whatsapp) {
         
         const data = await response.json();
         
-        // Si existe, devolverlo
         if (data && data.length > 0) {
             console.log('✅ Cliente encontrado:', data[0]);
             return data[0];
@@ -70,9 +68,7 @@ window.crearCliente = async function(nombre, whatsapp) {
         const negocioId = getNegocioId();
         console.log('➕ Creando nuevo cliente:', { nombre, whatsapp, negocio: negocioId });
         
-        // PRIMERO: Verificar si ya existe en ESTE negocio
         const checkUrl = `${window.SUPABASE_URL}/rest/v1/clientes_autorizados?negocio_id=eq.${negocioId}&whatsapp=eq.${whatsapp}&select=*`;
-        console.log('🔍 Verificando existencia:', checkUrl);
         
         const checkResponse = await fetch(checkUrl, {
             headers: {
@@ -89,7 +85,6 @@ window.crearCliente = async function(nombre, whatsapp) {
             }
         }
         
-        // SEGUNDO: Si no existe, CREARLO
         console.log('📝 Cliente no existe en este negocio, creando...');
         
         const createResponse = await fetch(
@@ -119,7 +114,6 @@ window.crearCliente = async function(nombre, whatsapp) {
                 error: errorText
             });
             
-            // Si es 409, puede ser un falso positivo, intentar obtener el cliente de nuevo
             if (createResponse.status === 409) {
                 console.log('⚠️ Conflicto 409, intentando recuperar cliente existente...');
                 
@@ -237,7 +231,6 @@ window.getClientesRegistrados = async function() {
     }
 };
 
-// Alias para compatibilidad con código existente
 window.getClientesAutorizados = window.getClientesRegistrados;
 
 /**
@@ -274,7 +267,6 @@ window.eliminarCliente = async function(whatsapp) {
     }
 };
 
-// Alias para compatibilidad
 window.eliminarClienteAutorizado = window.eliminarCliente;
 
 // ============================================
@@ -283,8 +275,6 @@ window.eliminarClienteAutorizado = window.eliminarCliente;
 
 /**
  * Verifica si un cliente tiene solicitud pendiente
- * @param {string} whatsapp - Número completo con 53 al inicio
- * @returns {Promise<boolean>}
  */
 window.tieneSolicitudPendiente = async function(whatsapp) {
     try {
@@ -312,8 +302,6 @@ window.tieneSolicitudPendiente = async function(whatsapp) {
 
 /**
  * Obtiene el estado de la última solicitud de un cliente
- * @param {string} whatsapp - Número completo con 53 al inicio
- * @returns {Promise<string|null>} - 'pendiente', 'aprobado', 'rechazado' o null
  */
 window.obtenerEstadoSolicitud = async function(whatsapp) {
     try {
@@ -348,9 +336,6 @@ window.obtenerEstadoSolicitud = async function(whatsapp) {
 
 /**
  * Envía solicitud de registro (borra TODAS las anteriores automáticamente)
- * @param {string} nombre - Nombre del cliente
- * @param {string} whatsapp - Número SIN +53 (ej: 55002272)
- * @returns {Promise<object>} - Resultado de la operación
  */
 window.solicitarRegistroCliente = async function(nombre, whatsapp) {
     try {
@@ -360,14 +345,12 @@ window.solicitarRegistroCliente = async function(nombre, whatsapp) {
         
         console.log('📝 Procesando solicitud para:', nombre, numeroCompleto);
         
-        // PASO 1: Verificar si ya es cliente autorizado
         const clienteExistente = await window.verificarAccesoCliente(numeroCompleto);
         if (clienteExistente) {
             console.log('✅ Ya es cliente autorizado, acceso directo');
             return { success: true, yaAutorizado: true, cliente: clienteExistente };
         }
         
-        // PASO 2: Buscar y ELIMINAR TODAS las solicitudes anteriores (de cualquier estado)
         const buscarResponse = await fetch(
             `${window.SUPABASE_URL}/rest/v1/cliente_solicitudes?negocio_id=eq.${negocioId}&whatsapp=eq.${numeroCompleto}&select=id`,
             {
@@ -396,7 +379,6 @@ window.solicitarRegistroCliente = async function(nombre, whatsapp) {
             }
         }
         
-        // PASO 3: Crear nueva solicitud pendiente
         const nuevaSolicitud = {
             negocio_id: negocioId,
             nombre: nombre,
@@ -431,7 +413,6 @@ window.solicitarRegistroCliente = async function(nombre, whatsapp) {
         const solicitudCreada = await crearResponse.json();
         console.log('✅ Solicitud creada:', solicitudCreada);
         
-        // PASO 4: NOTIFICAR AL ADMIN (WhatsApp + Push)
         const configNegocio = await window.cargarConfiguracionNegocio();
         const telefonoAdmin = configNegocio?.telefono || '00000000';
         
@@ -451,14 +432,12 @@ WhatsApp: +${numeroCompleto}
 Negocio: ${configNegocio?.nombre || 'Mi Negocio'}
 Fecha: ${fechaFormateada}`;
 
-        // Enviar WhatsApp al admin
         if (window.enviarWhatsApp) {
             window.enviarWhatsApp(telefonoAdmin, mensajeWhatsApp);
         } else {
             console.warn('⚠️ window.enviarWhatsApp no disponible');
         }
         
-        // Enviar push notification (con strings limpiados)
         if (window.enviarNotificacionPush) {
             const tituloPush = `Nueva solicitud - ${nombre}`;
             const mensajePush = `Cliente: ${nombre} WhatsApp: +${numeroCompleto} Negocio: ${configNegocio?.nombre || 'Mi Negocio'}`;
@@ -486,7 +465,6 @@ Fecha: ${fechaFormateada}`;
 
 /**
  * Obtiene todas las solicitudes pendientes (para admin)
- * @returns {Promise<array>}
  */
 window.getSolicitudesPendientes = async function() {
     try {
@@ -513,14 +491,13 @@ window.getSolicitudesPendientes = async function() {
 };
 
 /**
- * Aprueba una solicitud de cliente (crea el cliente y actualiza estado)
- * @param {object} solicitud - Objeto de la solicitud
- * @returns {Promise<boolean>}
+ * Aprueba una solicitud de cliente (crea el cliente, actualiza estado y notifica)
  */
 window.aprobarSolicitudCliente = async function(solicitud) {
     try {
         const negocioId = getNegocioId();
         console.log(`✅ Aprobando solicitud de ${solicitud.nombre}`);
+        console.log(`📱 WhatsApp del cliente: ${solicitud.whatsapp}`);
         
         // 1. Insertar en clientes_autorizados
         const nuevoCliente = {
@@ -547,9 +524,11 @@ window.aprobarSolicitudCliente = async function(solicitud) {
         
         if (!insertResponse.ok) {
             const error = await insertResponse.text();
-            console.error('Error al insertar cliente:', error);
+            console.error('❌ Error al insertar cliente:', error);
             return false;
         }
+        
+        console.log('✅ Cliente insertado correctamente');
         
         // 2. Actualizar estado de la solicitud a 'aprobado'
         const updateResponse = await fetch(
@@ -566,10 +545,12 @@ window.aprobarSolicitudCliente = async function(solicitud) {
         );
         
         if (!updateResponse.ok) {
-            console.error('Error actualizando estado:', await updateResponse.text());
+            console.error('⚠️ Error actualizando estado:', await updateResponse.text());
+        } else {
+            console.log('✅ Estado de solicitud actualizado a "aprobado"');
         }
         
-        // 3. Enviar WhatsApp de confirmación al cliente
+        // 3. Enviar WhatsApp de confirmación al CLIENTE
         const configNegocio = await window.cargarConfiguracionNegocio();
         const nombreNegocio = configNegocio?.nombre || 'nuestro salón';
         
@@ -582,30 +563,56 @@ Ingresa con tu numero: ${solicitud.whatsapp}
 
 Te esperamos!`;
 
+        console.log(`📤 Enviando WhatsApp de confirmación al cliente: ${solicitud.whatsapp}`);
+        console.log(`📝 Mensaje: ${mensajeCliente.substring(0, 100)}...`);
+        
         if (window.enviarWhatsApp) {
-            window.enviarWhatsApp(solicitud.whatsapp, mensajeCliente);
+            const resultado = window.enviarWhatsApp(solicitud.whatsapp, mensajeCliente);
+            console.log(`📱 Resultado del envío: ${resultado ? 'Exitoso' : 'Fallido'}`);
+        } else {
+            console.error('❌ window.enviarWhatsApp NO está definida');
         }
         
-        console.log('✅ Solicitud aprobada');
+        // 4. Enviar PUSH NOTIFICATION al ADMIN
+        console.log(`📢 Enviando push notification al admin...`);
+        
+        if (window.enviarNotificacionPush) {
+            const tituloPush = `✅ Cliente aprobado - ${solicitud.nombre}`;
+            const mensajePush = `Cliente ${solicitud.nombre} fue aprobado. WhatsApp: ${solicitud.whatsapp}`;
+            
+            const resultadoPush = await window.enviarNotificacionPush(
+                tituloPush,
+                mensajePush,
+                'white_check_mark',
+                'high'
+            );
+            
+            if (resultadoPush) {
+                console.log('✅ Push notification enviada correctamente');
+            } else {
+                console.warn('⚠️ Error al enviar push notification');
+            }
+        } else {
+            console.error('❌ window.enviarNotificacionPush NO está definida');
+        }
+        
+        console.log(`✅ Solicitud de ${solicitud.nombre} aprobada exitosamente`);
         return true;
         
     } catch (error) {
-        console.error('Error aprobando solicitud:', error);
+        console.error('❌ Error aprobando solicitud:', error);
         return false;
     }
 };
 
 /**
  * Rechaza una solicitud de cliente (NO envía notificación)
- * @param {object} solicitud - Objeto de la solicitud
- * @returns {Promise<boolean>}
  */
 window.rechazarSolicitudCliente = async function(solicitud) {
     try {
         const negocioId = getNegocioId();
         console.log(`❌ Rechazando solicitud de ${solicitud.nombre}`);
         
-        // SOLO actualizar estado a 'rechazado' - NO enviar WhatsApp
         const updateResponse = await fetch(
             `${window.SUPABASE_URL}/rest/v1/cliente_solicitudes?negocio_id=eq.${negocioId}&id=eq.${solicitud.id}`,
             {

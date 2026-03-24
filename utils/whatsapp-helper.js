@@ -1,6 +1,7 @@
 // utils/whatsapp-helper.js - VERSIÓN GENÉRICA COMPLETA
 // CORREGIDA: Push notification, WhatsApp en móvil/PC, cancelaciones
 // CORREGIDA: Limpieza de caracteres para ntfy.sh (ISO-8859-1)
+// CORREGIDA: Usa https://wa.me/ para WhatsApp (compatible con WhatsApp Business)
 
 console.log('📱 whatsapp-helper.js - VERSIÓN CORREGIDA');
 
@@ -47,50 +48,60 @@ window.esMobile = function() {
 };
 
 // ============================================
-// FUNCIÓN UNIVERSAL WHATSAPP (CORREGIDA)
+// FUNCIÓN UNIVERSAL WHATSAPP (USA https://wa.me/)
 // ============================================
 window.enviarWhatsApp = function(telefono, mensaje) {
     try {
         console.log('📤 enviarWhatsApp llamado a:', telefono);
         console.log('📤 mensaje:', mensaje ? mensaje.substring(0, 100) + '...' : 'sin mensaje');
         
-        // Limpiar teléfono
+        // Limpiar teléfono (solo números)
         const telefonoLimpio = telefono.toString().replace(/\D/g, '');
+        
+        // Asegurar que tenga código de país (53 para Cuba)
         let numeroCompleto = telefonoLimpio;
-        if (!numeroCompleto.startsWith('53')) {
+        if (!numeroCompleto.startsWith('53') && numeroCompleto.length === 8) {
             numeroCompleto = `53${telefonoLimpio}`;
         }
         
+        // Codificar el mensaje
         const mensajeCodificado = encodeURIComponent(mensaje);
         
-        // Detectar si es móvil o PC
-        const isMobile = window.esMobile();
+        // Usar URL oficial de WhatsApp (funciona con WhatsApp Business)
+        const url = `https://wa.me/${numeroCompleto}?text=${mensajeCodificado}`;
         
-        let url;
-        if (isMobile) {
-            // En móvil: usar esquema de la app
-            url = `whatsapp://send?phone=${numeroCompleto}&text=${mensajeCodificado}`;
-            console.log('📱 Móvil detectado, usando app:', url);
-        } else {
-            // En PC: usar WhatsApp Web
-            url = `https://web.whatsapp.com/send?phone=${numeroCompleto}&text=${mensajeCodificado}`;
-            console.log('💻 PC detectado, usando WhatsApp Web:', url);
+        console.log('🔗 URL de WhatsApp:', url);
+        
+        // Intentar abrir en una nueva pestaña/ventana
+        const ventana = window.open(url, '_blank');
+        
+        // Verificar si se pudo abrir
+        if (!ventana || ventana.closed || typeof ventana.closed === 'undefined') {
+            console.warn('⚠️ No se pudo abrir ventana, usando método alternativo');
+            
+            // Método alternativo: crear un enlace temporal
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
         
-        window.open(url, '_blank');
         return true;
         
     } catch (error) {
         console.error('❌ Error en enviarWhatsApp:', error);
         
-        // Fallback: usar API
+        // Fallback: mostrar el número en una alerta
         const telefonoLimpio = telefono.toString().replace(/\D/g, '');
         let numeroCompleto = telefonoLimpio;
-        if (!numeroCompleto.startsWith('53')) {
+        if (!numeroCompleto.startsWith('53') && numeroCompleto.length === 8) {
             numeroCompleto = `53${telefonoLimpio}`;
         }
-        const mensajeCodificado = encodeURIComponent(mensaje);
-        window.open(`https://api.whatsapp.com/send?phone=${numeroCompleto}&text=${mensajeCodificado}`, '_blank');
+        
+        alert(`📱 Contacto WhatsApp: +${numeroCompleto}\n\nMensaje: ${mensaje.substring(0, 100)}...`);
         return false;
     }
 };
