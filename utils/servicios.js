@@ -234,3 +234,192 @@ setTimeout(async () => {
 }, 1000);
 
 console.log('✅ salonServicios inicializado');
+// utils/servicios.js - Agregar al final del archivo
+
+// ============================================
+// NUEVAS FUNCIONES: ASIGNAR PROFESIONALES A SERVICIOS
+// ============================================
+
+/**
+ * Obtiene los profesionales asignados a un servicio
+ */
+window.getProfesionalesPorServicio = async function(servicioId) {
+    try {
+        const negocioId = getNegocioId();
+        if (!negocioId || !servicioId) return [];
+        
+        const response = await fetch(
+            `${window.SUPABASE_URL}/rest/v1/servicios_profesionales?negocio_id=eq.${negocioId}&servicio_id=eq.${servicioId}&select=profesional_id`,
+            {
+                headers: {
+                    'apikey': window.SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+                }
+            }
+        );
+        
+        if (!response.ok) return [];
+        
+        const data = await response.json();
+        const ids = data.map(item => item.profesional_id);
+        
+        if (ids.length === 0) return [];
+        
+        // Obtener datos completos de los profesionales
+        const profesionalesResponse = await fetch(
+            `${window.SUPABASE_URL}/rest/v1/profesionales?negocio_id=eq.${negocioId}&id=in.(${ids.join(',')})&activo=eq.true&select=*`,
+            {
+                headers: {
+                    'apikey': window.SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+                }
+            }
+        );
+        
+        if (!profesionalesResponse.ok) return [];
+        
+        const profesionales = await profesionalesResponse.json();
+        return profesionales;
+        
+    } catch (error) {
+        console.error('Error obteniendo profesionales por servicio:', error);
+        return [];
+    }
+};
+
+/**
+ * Asigna un profesional a un servicio
+ */
+window.asignarProfesionalAServicio = async function(servicioId, profesionalId) {
+    try {
+        const negocioId = getNegocioId();
+        if (!negocioId || !servicioId || !profesionalId) return false;
+        
+        // Verificar si ya existe
+        const checkResponse = await fetch(
+            `${window.SUPABASE_URL}/rest/v1/servicios_profesionales?negocio_id=eq.${negocioId}&servicio_id=eq.${servicioId}&profesional_id=eq.${profesionalId}&select=id`,
+            {
+                headers: {
+                    'apikey': window.SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+                }
+            }
+        );
+        
+        const existing = await checkResponse.json();
+        if (existing && existing.length > 0) {
+            console.log('⚠️ Ya existe la asignación');
+            return true;
+        }
+        
+        const response = await fetch(
+            `${window.SUPABASE_URL}/rest/v1/servicios_profesionales`,
+            {
+                method: 'POST',
+                headers: {
+                    'apikey': window.SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({
+                    negocio_id: negocioId,
+                    servicio_id: servicioId,
+                    profesional_id: profesionalId
+                })
+            }
+        );
+        
+        if (!response.ok) {
+            console.error('Error al asignar:', await response.text());
+            return false;
+        }
+        
+        console.log('✅ Profesional asignado al servicio');
+        return true;
+        
+    } catch (error) {
+        console.error('Error asignando profesional:', error);
+        return false;
+    }
+};
+
+/**
+ * Quita la asignación de un profesional a un servicio
+ */
+window.removerProfesionalDeServicio = async function(servicioId, profesionalId) {
+    try {
+        const negocioId = getNegocioId();
+        if (!negocioId || !servicioId || !profesionalId) return false;
+        
+        const response = await fetch(
+            `${window.SUPABASE_URL}/rest/v1/servicios_profesionales?negocio_id=eq.${negocioId}&servicio_id=eq.${servicioId}&profesional_id=eq.${profesionalId}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'apikey': window.SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+                }
+            }
+        );
+        
+        if (!response.ok) return false;
+        
+        console.log('✅ Profesional removido del servicio');
+        return true;
+        
+    } catch (error) {
+        console.error('Error removiendo profesional:', error);
+        return false;
+    }
+};
+
+/**
+ * Obtiene todos los profesionales con sus servicios asignados
+ */
+window.getProfesionalesConServicios = async function() {
+    try {
+        const negocioId = getNegocioId();
+        if (!negocioId) return [];
+        
+        const response = await fetch(
+            `${window.SUPABASE_URL}/rest/v1/profesionales?negocio_id=eq.${negocioId}&activo=eq.true&select=*`,
+            {
+                headers: {
+                    'apikey': window.SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+                }
+            }
+        );
+        
+        if (!response.ok) return [];
+        
+        const profesionales = await response.json();
+        
+        // Para cada profesional, obtener sus servicios
+        for (const prof of profesionales) {
+            const serviciosResponse = await fetch(
+                `${window.SUPABASE_URL}/rest/v1/servicios_profesionales?negocio_id=eq.${negocioId}&profesional_id=eq.${prof.id}&select=servicio_id`,
+                {
+                    headers: {
+                        'apikey': window.SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+                    }
+                }
+            );
+            
+            if (serviciosResponse.ok) {
+                const serviciosData = await serviciosResponse.json();
+                prof.servicios_ids = serviciosData.map(s => s.servicio_id);
+            } else {
+                prof.servicios_ids = [];
+            }
+        }
+        
+        return profesionales;
+        
+    } catch (error) {
+        console.error('Error obteniendo profesionales con servicios:', error);
+        return [];
+    }
+};

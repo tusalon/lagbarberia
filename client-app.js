@@ -237,15 +237,15 @@ function ClientApp() {
                             />
                             
                             {/* SECCIÓN 2: PROFESIONALES */}
-                            {selectedService && (
-                                <div id="profesional-section">
-                                    <ProfesionalSelector 
-                                        onSelect={setSelectedProfesional} 
-                                        selectedProfesional={selectedProfesional}
-                                    />
-                                </div>
-                            )}
-                            
+                           {selectedService && (
+    <div id="profesional-section">
+        <ProfesionalSelector 
+            onSelect={setSelectedProfesional} 
+            selectedProfesional={selectedProfesional}
+            selectedService={selectedService}
+        />
+    </div>
+)}
                             {/* SECCIÓN 3: CALENDARIO */}
                             {selectedProfesional && (
                                 <div id="calendar-section">
