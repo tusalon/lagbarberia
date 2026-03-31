@@ -1,4 +1,4 @@
-// components/TimeSlots.js - Versión masculina
+// components/TimeSlots.js - Versión femenina con filtro de horarios permitidos por servicio
 
 function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
     const [slots, setSlots] = React.useState([]);
@@ -119,6 +119,7 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
             setLoading(true);
             setError(null);
             try {
+                // Validar antelación máxima
                 const hoy = new Date();
                 const fechaSeleccionada = new Date(date + 'T00:00:00');
                 const diffTime = fechaSeleccionada - hoy;
@@ -146,8 +147,10 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
                     return;
                 }
                 
+                // Slots base (todos los horarios del profesional para ese día)
                 let baseSlots = indicesDelDia.map(indice => indiceToHoraLegible(indice));
                 
+                // 🔥 FILTRO POR HORARIOS PERMITIDOS DEL SERVICIO (si existen)
                 if (service.horarios_permitidos && service.horarios_permitidos.length > 0) {
                     baseSlots = baseSlots.filter(slot => service.horarios_permitidos.includes(slot));
                     console.log(`📋 Slots filtrados por horarios permitidos del servicio:`, baseSlots);
@@ -214,12 +217,12 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
     if (!verificacionCompleta) {
         return (
             <div className="space-y-4 animate-fade-in">
-                <h2 className="text-lg font-semibold text-amber-700 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-pink-700 flex items-center gap-2">
                     <span className="text-2xl">⏰</span>
                     4. Elegí un horario con {profesional.nombre}
                 </h2>
                 <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
                 </div>
             </div>
         );
@@ -234,16 +237,16 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
         
         return (
             <div className="space-y-4 animate-fade-in">
-                <h2 className="text-lg font-semibold text-amber-700 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-pink-700 flex items-center gap-2">
                     <span className="text-2xl">⏰</span>
                     4. Elegí un horario con {profesional.nombre}
                 </h2>
-                <div className="text-center p-8 bg-amber-50 rounded-xl border border-amber-200">
-                    <div className="text-5xl text-amber-500 mb-3">📅❌</div>
-                    <p className="text-amber-700 font-medium">
+                <div className="text-center p-8 bg-pink-50 rounded-xl border border-pink-200">
+                    <div className="text-5xl text-pink-400 mb-3">📅❌</div>
+                    <p className="text-pink-700 font-medium">
                         {profesional.nombre} no trabaja los {diaCapitalizado}s
                     </p>
-                    <p className="text-sm text-amber-600 mt-1">Elegí otro día de la semana</p>
+                    <p className="text-sm text-pink-500 mt-1">Elegí otro día de la semana</p>
                 </div>
             </div>
         );
@@ -251,11 +254,11 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
 
     return (
         <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-semibold text-amber-700 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-pink-700 flex items-center gap-2">
                 <span className="text-2xl">⏰</span>
                 4. Elegí un horario con {profesional.nombre}
                 {selectedTime && (
-                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full ml-2">
+                    <span className="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded-full ml-2">
                         ✓ Horario seleccionado
                     </span>
                 )}
@@ -263,23 +266,23 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
 
             {loading ? (
                 <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
                 </div>
             ) : error ? (
-                <div className="p-4 bg-amber-50 text-amber-700 rounded-lg text-sm border border-amber-200">{error}</div>
+                <div className="p-4 bg-pink-50 text-pink-600 rounded-lg text-sm border border-pink-200">{error}</div>
             ) : slots.length === 0 ? (
-                <div className="text-center p-8 bg-amber-50 rounded-xl border border-amber-200">
-                    <div className="text-5xl text-amber-500 mb-3">⏰❌</div>
-                    <p className="text-amber-700 font-medium">
+                <div className="text-center p-8 bg-pink-50 rounded-xl border border-pink-200">
+                    <div className="text-5xl text-pink-400 mb-3">⏰❌</div>
+                    <p className="text-pink-700 font-medium">
                         No hay horarios disponibles para {profesional.nombre} el {formatDateLocal(date)}
                     </p>
-                    <p className="text-sm text-amber-600 mt-1">Probá con otra fecha</p>
+                    <p className="text-sm text-pink-500 mt-1">Probá con otra fecha</p>
                 </div>
             ) : (
                 <>
-                    <div className="text-sm bg-gradient-to-r from-amber-50 to-amber-100 p-4 rounded-xl border border-amber-200">
-                        <div className="flex items-center gap-2 text-amber-700">
-                            <span className="text-amber-600">⏰</span>
+                    <div className="text-sm bg-gradient-to-r from-pink-50 to-pink-100 p-4 rounded-xl border border-pink-200">
+                        <div className="flex items-center gap-2 text-pink-700">
+                            <span className="text-pink-500">⏰</span>
                             <span className="font-medium">
                                 Horarios disponibles de {profesional.nombre} para {formatDateLocal(date)}:
                             </span>
@@ -287,8 +290,8 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
                     </div>
                     
                     {date === getCurrentLocalDate() && (
-                        <div className="text-sm text-amber-700 bg-amber-50 p-3 rounded-lg flex items-center gap-2 border border-amber-200">
-                            <span className="text-amber-600">⏰</span>
+                        <div className="text-sm text-pink-600 bg-pink-50 p-3 rounded-lg flex items-center gap-2 border border-pink-200">
+                            <span className="text-pink-500">⏰</span>
                             <span>
                                 Solo se muestran horarios con al menos 2 horas de anticipación 
                                 (hora actual + 2h)
@@ -309,8 +312,8 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
                                     className={`
                                         py-3 px-2 rounded-lg text-base font-semibold transition-all transform flex flex-col items-center
                                         ${isSelected
-                                            ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-lg scale-105 ring-2 ring-amber-300'
-                                            : 'bg-white text-amber-700 border-2 border-amber-200 hover:border-amber-500 hover:bg-amber-50 hover:scale-105 hover:shadow-md'}
+                                            ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg scale-105 ring-2 ring-pink-300'
+                                            : 'bg-white text-pink-700 border-2 border-pink-200 hover:border-pink-400 hover:bg-pink-50 hover:scale-105 hover:shadow-md'}
                                     `}
                                 >
                                     <span className="text-sm">{esMediaHora ? '⏱️' : '⌛'}</span>
@@ -320,7 +323,7 @@ function TimeSlots({ service, date, profesional, onTimeSelect, selectedTime }) {
                         })}
                     </div>
                     
-                    <p className="text-xs text-amber-500 mt-3 text-center">
+                    <p className="text-xs text-pink-400 mt-3 text-center">
                         ⏰ Horarios cada 30 minutos
                     </p>
                 </>

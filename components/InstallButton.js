@@ -84,7 +84,7 @@ function InstallButton() {
         return (
             <button
                 onClick={handleInstallClick}
-                className="fixed bottom-6 left-6 z-50 bg-gradient-to-r from-amber-600 to-amber-700 text-white px-6 py-3 rounded-full shadow-2xl hover:from-amber-700 hover:to-amber-800 transition-all transform hover:scale-110 flex items-center gap-3 border-2 border-amber-300"
+                className="fixed bottom-6 left-6 z-50 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-full shadow-2xl hover:from-pink-600 hover:to-pink-700 transition-all transform hover:scale-110 flex items-center gap-3 border-2 border-pink-300"
                 title="Instalar aplicación"
             >
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
@@ -92,7 +92,7 @@ function InstallButton() {
                 </div>
                 <div className="text-left">
                     <div className="font-bold text-sm">Instalar App</div>
-                    <div className="text-xs text-amber-200">iPhone: Compartir → Pantalla inicio</div>
+                    <div className="text-xs text-pink-200">iPhone: Compartir → Pantalla inicio</div>
                 </div>
             </button>
         );
@@ -102,7 +102,7 @@ function InstallButton() {
     return (
         <button
             onClick={handleInstallClick}
-            className="fixed bottom-6 left-6 z-50 bg-gradient-to-r from-amber-600 to-amber-700 text-white px-6 py-3 rounded-full shadow-2xl hover:from-amber-700 hover:to-amber-800 transition-all transform hover:scale-110 flex items-center gap-3 border-2 border-amber-300"
+            className="fixed bottom-6 left-6 z-50 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-full shadow-2xl hover:from-pink-600 hover:to-pink-700 transition-all transform hover:scale-110 flex items-center gap-3 border-2 border-pink-300"
             title="Instalar aplicación"
         >
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
@@ -112,7 +112,7 @@ function InstallButton() {
             </div>
             <div className="text-left">
                 <div className="font-bold text-sm">Instalar App</div>
-                <div className="text-xs text-amber-200">
+                <div className="text-xs text-pink-200">
                     {platform === 'android' 
                         ? 'Android: Tocá aquí' 
                         : platform === 'desktop'

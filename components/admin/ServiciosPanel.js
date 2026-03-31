@@ -77,7 +77,7 @@ function ServiciosPanel() {
         return (
             <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
                     <p className="text-gray-500 mt-4">Cargando servicios...</p>
                 </div>
             </div>
@@ -93,7 +93,7 @@ function ServiciosPanel() {
                         setEditando(null);
                         setMostrarForm(true);
                     }}
-                    className="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700"
+                    className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700"
                 >
                     + Nuevo Servicio
                 </button>
@@ -141,13 +141,12 @@ function ServiciosPanel() {
                                         <p className="text-xs text-gray-500 mt-1">{s.descripcion}</p>
                                     )}
                                     {s.horarios_permitidos && s.horarios_permitidos.length > 0 && (
-                                        <p className="text-xs text-amber-600 mt-1">
+                                        <p className="text-xs text-pink-600 mt-1">
                                             🕐 Horarios permitidos: {s.horarios_permitidos.join(', ')}
                                         </p>
                                     )}
                                 </div>
                                 <div className="flex gap-2">
-                                    {/* 🔥 NUEVO BOTÓN: Asignar profesionales */}
                                     <button
                                         onClick={() => setServicioParaAsignar(s)}
                                         className="text-purple-600 hover:text-purple-800 px-2"
@@ -190,7 +189,7 @@ function ServiciosPanel() {
     );
 }
 
-// COMPONENTE DE FORMULARIO DE SERVICIO (sin cambios)
+// COMPONENTE DE FORMULARIO DE SERVICIO
 function ServicioForm({ servicio, onGuardar, onCancelar }) {
     const [form, setForm] = React.useState(servicio || {
         nombre: '',
@@ -242,8 +241,8 @@ function ServicioForm({ servicio, onGuardar, onCancelar }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded-lg border border-amber-200">
-            <h3 className="font-semibold mb-4 text-amber-800">
+        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded-lg border border-pink-200">
+            <h3 className="font-semibold mb-4 text-pink-800">
                 {servicio ? '✏️ Editar Servicio' : '➕ Nuevo Servicio'}
             </h3>
             
@@ -256,7 +255,7 @@ function ServicioForm({ servicio, onGuardar, onCancelar }) {
                         type="text"
                         value={form.nombre}
                         onChange={(e) => setForm({...form, nombre: e.target.value})}
-                        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                         placeholder="Ej: Corte de Cabello"
                         required
                     />
@@ -275,7 +274,7 @@ function ServicioForm({ servicio, onGuardar, onCancelar }) {
                                 setForm({...form, duracion: valor});
                             }}
                             onFocus={(e) => e.target.select()}
-                            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                             placeholder="Ej: 45"
                             inputMode="numeric"
                             pattern="[0-9]*"
@@ -297,7 +296,7 @@ function ServicioForm({ servicio, onGuardar, onCancelar }) {
                                 setForm({...form, precio: valor});
                             }}
                             onFocus={(e) => e.target.select()}
-                            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                             placeholder="Ej: 2500"
                             inputMode="decimal"
                             pattern="[0-9]*\.?[0-9]*"
@@ -314,7 +313,7 @@ function ServicioForm({ servicio, onGuardar, onCancelar }) {
                         type="text"
                         value={horariosStr}
                         onChange={(e) => setHorariosStr(e.target.value)}
-                        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                         placeholder="Ej: 09:00, 11:00, 15:30"
                     />
                     <p className="text-xs text-gray-400 mt-1">
@@ -330,7 +329,7 @@ function ServicioForm({ servicio, onGuardar, onCancelar }) {
                     <textarea
                         value={form.descripcion}
                         onChange={(e) => setForm({...form, descripcion: e.target.value})}
-                        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                         rows="2"
                         placeholder="Descripción opcional del servicio"
                     />
@@ -347,7 +346,7 @@ function ServicioForm({ servicio, onGuardar, onCancelar }) {
                 </button>
                 <button
                     type="submit"
-                    className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+                    className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
                 >
                     {servicio ? 'Actualizar' : 'Guardar'}
                 </button>
@@ -356,7 +355,7 @@ function ServicioForm({ servicio, onGuardar, onCancelar }) {
     );
 }
 
-// 🔥 NUEVO COMPONENTE: Asignar Profesionales a Servicio
+// 🔥 COMPONENTE MODAL: Asignar Profesionales a Servicio
 function AsignarProfesionalesModal({ servicio, onClose }) {
     const [profesionales, setProfesionales] = React.useState([]);
     const [asignados, setAsignados] = React.useState([]);
@@ -370,13 +369,11 @@ function AsignarProfesionalesModal({ servicio, onClose }) {
     const cargarDatos = async () => {
         setCargando(true);
         try {
-            // Cargar todos los profesionales activos
             if (window.salonProfesionales) {
                 const todos = await window.salonProfesionales.getAll(true);
                 setProfesionales(todos || []);
             }
             
-            // Cargar profesionales ya asignados a este servicio
             if (window.getProfesionalesPorServicio) {
                 const asignadosData = await window.getProfesionalesPorServicio(servicio.id);
                 setAsignados(asignadosData.map(p => p.id));
@@ -392,7 +389,6 @@ function AsignarProfesionalesModal({ servicio, onClose }) {
         setGuardando(true);
         try {
             if (asignados.includes(profesionalId)) {
-                // Remover
                 if (window.removerProfesionalDeServicio) {
                     const ok = await window.removerProfesionalDeServicio(servicio.id, profesionalId);
                     if (ok) {
@@ -400,7 +396,6 @@ function AsignarProfesionalesModal({ servicio, onClose }) {
                     }
                 }
             } else {
-                // Agregar
                 if (window.asignarProfesionalAServicio) {
                     const ok = await window.asignarProfesionalAServicio(servicio.id, profesionalId);
                     if (ok) {
@@ -420,7 +415,7 @@ function AsignarProfesionalesModal({ servicio, onClose }) {
         return (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-xl p-6">
-                    <div className="animate-spin h-8 w-8 border-b-2 border-amber-500 mx-auto"></div>
+                    <div className="animate-spin h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
                     <p className="text-gray-500 mt-4">Cargando profesionales...</p>
                 </div>
             </div>
@@ -443,7 +438,7 @@ function AsignarProfesionalesModal({ servicio, onClose }) {
                     <p className="text-sm text-gray-500 mb-4">
                         Seleccioná qué profesionales pueden realizar este servicio.
                         <br />
-                        <span className="text-amber-600 text-xs">
+                        <span className="text-pink-600 text-xs">
                             Los clientes solo verán los profesionales marcados aquí.
                         </span>
                     </p>
@@ -466,12 +461,12 @@ function AsignarProfesionalesModal({ servicio, onClose }) {
                                         className={`
                                             w-full flex items-center gap-3 p-3 rounded-lg border transition-all
                                             ${isSelected 
-                                                ? 'border-amber-500 bg-amber-50' 
-                                                : 'border-gray-200 hover:border-amber-300 hover:bg-amber-50/50'}
+                                                ? 'border-pink-500 bg-pink-50' 
+                                                : 'border-gray-200 hover:border-pink-300 hover:bg-pink-50/50'}
                                             ${guardando ? 'opacity-50 cursor-wait' : ''}
                                         `}
                                     >
-                                        <div className={`w-10 h-10 ${prof.color || 'bg-amber-600'} rounded-full flex items-center justify-center text-white text-lg`}>
+                                        <div className={`w-10 h-10 ${prof.color || 'bg-pink-500'} rounded-full flex items-center justify-center text-white text-lg`}>
                                             {prof.avatar || '👤'}
                                         </div>
                                         <div className="flex-1 text-left">
@@ -479,7 +474,7 @@ function AsignarProfesionalesModal({ servicio, onClose }) {
                                             <div className="text-xs text-gray-500">{prof.especialidad}</div>
                                         </div>
                                         {isSelected && (
-                                            <div className="text-amber-600 text-xl">
+                                            <div className="text-pink-500 text-xl">
                                                 ✅
                                             </div>
                                         )}
@@ -497,7 +492,7 @@ function AsignarProfesionalesModal({ servicio, onClose }) {
                         </div>
                         <button
                             onClick={onClose}
-                            className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+                            className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
                         >
                             Cerrar
                         </button>

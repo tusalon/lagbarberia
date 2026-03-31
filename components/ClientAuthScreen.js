@@ -1,5 +1,4 @@
-// components/ClientAuthScreen.js - VERSIÓN CON SISTEMA DE SOLICITUDES
-// Los clientes nuevos deben enviar solicitud y esperar aprobación
+// components/ClientAuthScreen.js - VERSIÓN REGISTRO AUTOMÁTICO
 
 function ClientAuthScreen({ onAccessGranted, onGoBack }) {
     const [config, setConfig] = React.useState(null);
@@ -13,8 +12,6 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
     const [esProfesional, setEsProfesional] = React.useState(false);
     const [profesionalInfo, setProfesionalInfo] = React.useState(null);
     const [esAdmin, setEsAdmin] = React.useState(false);
-    const [estadoSolicitud, setEstadoSolicitud] = React.useState(null);
-    const [solicitudEnviada, setSolicitudEnviada] = React.useState(false);
 
     // Cargar configuración del negocio y la imagen
     React.useEffect(() => {
@@ -25,212 +22,182 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
         };
         cargarDatos();
 
-        // Precargar la imagen de fondo (LAG Barberia)
+        // Precargar la imagen de fondo
         const img = new Image();
-        img.src = "/lagbarberia/images/LAG.barberia.png";
-        img.onload = () => {
-            console.log('✅ Imagen de fondo cargada correctamente');
-            setImagenCargada(true);
-        };
-        img.onerror = () => {
-            console.error('❌ Error cargando imagen de fondo, usando fallback');
-            setImagenCargada(true);
-        };
+        img.src = 'https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=2071&auto=format&fit=crop';
+        img.onload = () => setImagenCargada(true);
+        img.onerror = () => setImagenCargada(true);
     }, []);
 
-    // ============================================
-    // FUNCIÓN PARA VERIFICAR NÚMERO (CORREGIDA DEFINITIVA)
-    // ============================================
-    const verificarNumero = async (numero) => {
-        if (numero.length < 8) {
-            setClienteAutorizado(null);
-            setEsProfesional(false);
-            setProfesionalInfo(null);
-            setEsAdmin(false);
-            setEstadoSolicitud(null);
-            setSolicitudEnviada(false);
-            setError('');
-            return;
-        }
-        
-        setVerificando(true);
-        
-        const numeroLimpio = numero.replace(/\D/g, '');
-        const numeroCompleto = `53${numeroLimpio}`;
-        
-        try {
-            // VERIFICAR SI ES ADMIN (DUEÑO)
-            if (numeroLimpio === config?.telefono?.replace(/\D/g, '')) {
-                console.log('👑 Número de administrador detectado');
-                
-                const negocioId = window.NEGOCIO_ID_POR_DEFECTO || 
-                                  (typeof window.getNegocioId === 'function' ? 
-                                   window.getNegocioId() : 
-                                   '47666c9b-afa1-4286-a727-0e30f86611af');
-                
-                localStorage.removeItem('negocioId');
-                localStorage.removeItem('negocioNombre');
-                
-                localStorage.setItem('negocioId', negocioId);
-                localStorage.setItem('negocioNombre', config?.nombre || 'Negocio de Prueba');
-                
-                console.log('✅ negocioId guardado en localStorage:', negocioId);
-                console.log('✅ negocioNombre guardado:', config?.nombre);
-                
-                const loginTime = localStorage.getItem('adminLoginTime');
-                const tieneSesion = loginTime && (Date.now() - parseInt(loginTime)) < 8 * 60 * 60 * 1000;
-                
-                if (tieneSesion) {
-                    console.log('➡️ Redirigiendo a admin.html');
-                    window.location.href = 'admin.html';
-                } else {
-                    console.log('➡️ Redirigiendo a admin-login.html');
-                    window.location.href = 'admin-login.html';
-                }
-                return;
-            }
-            
-            // Verificar si es PROFESIONAL
-            if (window.verificarProfesionalPorTelefono) {
-                const profesional = await window.verificarProfesionalPorTelefono(numeroLimpio);
-                if (profesional) {
-                    setEsProfesional(true);
-                    setProfesionalInfo(profesional);
-                    setEsAdmin(false);
-                    setClienteAutorizado(null);
-                    setEstadoSolicitud(null);
-                    setSolicitudEnviada(false);
-                    setVerificando(false);
-                    return;
-                }
-            }
-            
-            // Verificar si es CLIENTE AUTORIZADO
-            const existe = await window.verificarAccesoCliente(numeroCompleto);
-            
-            if (existe) {
-                setClienteAutorizado(existe);
-                setEsProfesional(false);
-                setEsAdmin(false);
-                setEstadoSolicitud(null);
-                setSolicitudEnviada(false);
-                setError('');
-                setVerificando(false);
-                return;
-            }
-            
-            // Si no es cliente autorizado, verificar si tiene solicitud pendiente
-            if (window.obtenerEstadoSolicitud) {
-                const estado = await window.obtenerEstadoSolicitud(numeroLimpio);
-                setEstadoSolicitud(estado);
-                
-                if (estado === 'pendiente') {
-                    setSolicitudEnviada(true);
-                } else if (estado === 'rechazado') {
-                    setSolicitudEnviada(false);
-                    setEstadoSolicitud(null);
-                } else {
-                    setSolicitudEnviada(false);
-                }
-            }
-            
-            setClienteAutorizado(null);
-            setEsProfesional(false);
-            setEsAdmin(false);
-            setError('');
-            
-        } catch (err) {
-            console.error('Error verificando:', err);
-        } finally {
-            setVerificando(false);
-        }
-    };
-
-    // ============================================
-    // HANDLE SUBMIT CORREGIDO - CON SISTEMA DE SOLICITUDES
-    // ============================================
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        if (!nombre.trim() || !whatsapp.trim()) {
-            setError('Completá todos los campos');
-            return;
-        }
-        
-        if (esAdmin || esProfesional) {
-            return;
-        }
-        
-        setVerificando(true);
+   // ============================================
+// FUNCIÓN PARA VERIFICAR NÚMERO (CORREGIDA DEFINITIVA)
+// ============================================
+const verificarNumero = async (numero) => {
+    if (numero.length < 8) {
+        setClienteAutorizado(null);
+        setEsProfesional(false);
+        setProfesionalInfo(null);
+        setEsAdmin(false);
         setError('');
-        
-        const numeroLimpio = whatsapp.replace(/\D/g, '');
-        const numeroCompleto = `53${numeroLimpio}`;
-        
-        try {
-            console.log('🔍 Verificando si es cliente autorizado...');
-            const autorizado = await window.verificarAccesoCliente(numeroCompleto);
+        return;
+    }
+    
+    setVerificando(true);
+    
+    const numeroLimpio = numero.replace(/\D/g, '');
+    const numeroCompleto = `53${numeroLimpio}`;
+    
+    try {
+        // 🔥 VERIFICAR SI ES ADMIN (DUEÑO) - VERSIÓN CORREGIDA DEFINITIVA
+        if (numeroLimpio === config?.telefono?.replace(/\D/g, '')) {
+            console.log('👑 Número de administradora detectado para Negocio de Prueba');
             
-            if (autorizado) {
-                console.log('✅ Cliente autorizado, acceso directo');
-                const negocioId = window.NEGOCIO_ID_POR_DEFECTO || 
-                                  (typeof window.getNegocioId === 'function' ? 
-                                   window.getNegocioId() : null);
-                if (negocioId) {
-                    localStorage.setItem('negocioId', negocioId);
-                }
-                onAccessGranted(autorizado.nombre, numeroCompleto);
-                setVerificando(false);
-                return;
-            }
+            // 🔥 OBTENER EL NEGOCIO_ID CORRECTO
+            const negocioId = window.NEGOCIO_ID_POR_DEFECTO || 
+                              (typeof window.getNegocioId === 'function' ? 
+                               window.getNegocioId() : 
+                               'd4f7e2b1-3a8c-4b6d-9e5f-1c2d3e4f5a6b');
             
-            console.log('🔍 Verificando estado de solicitud...');
-            const estado = await window.obtenerEstadoSolicitud(numeroLimpio);
+            // 🔥 LIMPIAR CUALQUIER ID ANTERIOR
+            localStorage.removeItem('negocioId');
+            localStorage.removeItem('negocioNombre');
             
-            if (estado === 'pendiente') {
-                setError('⚠️ Ya enviaste una solicitud. Estamos procesándola, en breve recibirás respuesta.');
-                setVerificando(false);
-                return;
-            }
+            // 🔥 GUARDAR EL ID CORRECTO
+            localStorage.setItem('negocioId', negocioId);
+            localStorage.setItem('negocioNombre', config?.nombre || 'Negocio de Prueba');
             
-            console.log('📝 Enviando nueva solicitud...');
-            const resultado = await window.solicitarRegistroCliente(nombre, numeroLimpio);
+            console.log('✅ negocioId guardado en localStorage:', negocioId);
+            console.log('✅ negocioNombre guardado:', config?.nombre);
             
-            if (resultado.success && resultado.yaAutorizado) {
-                console.log('✅ Cliente ya autorizado (doble check)');
-                onAccessGranted(resultado.cliente.nombre, numeroCompleto);
-            } else if (resultado.success) {
-                setSolicitudEnviada(true);
-                setError('✅ Solicitud enviada correctamente. Recibirás confirmación cuando sea aprobada.');
-                setNombre('');
-                setWhatsapp('');
+            // Verificar si ya tiene sesión activa
+            const loginTime = localStorage.getItem('adminLoginTime');
+            const tieneSesion = loginTime && (Date.now() - parseInt(loginTime)) < 8 * 60 * 60 * 1000;
+            
+            if (tieneSesion) {
+                console.log('➡️ Redirigiendo a admin.html');
+                window.location.href = 'admin.html';
             } else {
-                setError('❌ Error al enviar la solicitud. Intentá más tarde.');
+                console.log('➡️ Redirigiendo a admin-login.html');
+                window.location.href = 'admin-login.html';
             }
-            
-        } catch (err) {
-            console.error('❌ Error en submit:', err);
-            setError('Error en el sistema. Intentá más tarde.');
-        } finally {
-            setVerificando(false);
+            return;
         }
-    };
+        
+        // Verificar si es PROFESIONAL
+        if (window.verificarProfesionalPorTelefono) {
+            const profesional = await window.verificarProfesionalPorTelefono(numeroLimpio);
+            if (profesional) {
+                setEsProfesional(true);
+                setProfesionalInfo(profesional);
+                setEsAdmin(false);
+                setClienteAutorizado(null);
+                setVerificando(false);
+                return;
+            }
+        }
+        
+        // Verificar si es CLIENTE AUTORIZADO
+        const existe = await window.verificarAccesoCliente(numeroCompleto);
+        
+        if (existe) {
+            setClienteAutorizado(existe);
+            setEsProfesional(false);
+            setEsAdmin(false);
+            setError('');
+        } else {
+            setClienteAutorizado(null);
+            setError('');
+        }
+    } catch (err) {
+        console.error('Error verificando:', err);
+    } finally {
+        setVerificando(false);
+    }
+};
+  // ============================================
+// FUNCIÓN CORREGIDA - SOLICITUD DE REGISTRO
+// ============================================
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!nombre.trim() || !whatsapp.trim()) {
+        setError('Completá todos los campos');
+        return;
+    }
+    
+    if (esAdmin || esProfesional) {
+        return;
+    }
+    
+    setVerificando(true);
+    
+    const numeroLimpio = whatsapp.replace(/\D/g, '');
+    const numeroCompleto = `53${numeroLimpio}`;
+    
+    try {
+        // 1. Verificar si ya es cliente autorizado
+        const autorizado = await window.verificarAccesoCliente(numeroCompleto);
+        
+        if (autorizado) {
+            console.log('✅ Cliente encontrado, acceso directo:', autorizado);
+            onAccessGranted(autorizado.nombre, numeroCompleto);
+            return;
+        }
+        
+        // 2. Verificar si hay solicitud pendiente
+        const solicitudPendiente = await window.verificarSolicitudPendiente(numeroCompleto);
+        
+        if (solicitudPendiente) {
+            setError('⚠️ Ya enviaste una solicitud de registro. Esperá la confirmación del administrador.');
+            setVerificando(false);
+            return;
+        }
+        
+        // 3. Crear nueva solicitud
+        const resultado = await window.crearSolicitudRegistro(nombre, numeroCompleto);
+        
+        if (resultado.success && resultado.yaRegistrado) {
+            // Ya estaba registrado (caso borde)
+            onAccessGranted(resultado.cliente.nombre, numeroCompleto);
+        } else if (resultado.success) {
+            // Solicitud creada exitosamente
+            setError('📋 ¡Solicitud enviada! Te avisaremos por WhatsApp cuando tu registro sea aprobado.');
+            // Limpiar formulario
+            setNombre('');
+            setWhatsapp('');
+            // Limpiar mensaje después de 5 segundos
+            setTimeout(() => {
+                setError('');
+            }, 5000);
+        } else if (resultado.yaSolicitado) {
+            setError(resultado.mensaje || 'Ya hay una solicitud pendiente para este número.');
+        } else {
+            setError(resultado.error || 'Error al enviar la solicitud. Intentá más tarde.');
+        }
+        
+    } catch (err) {
+        console.error('Error en submit:', err);
+        setError('Error en el sistema. Intentá más tarde.');
+    } finally {
+        setVerificando(false);
+    }
+};
 
-    // ============================================
-    // ACCESO DIRECTO PARA CLIENTE AUTORIZADO
-    // ============================================
+    // 🔥 FUNCIÓN CORREGIDA - USA EL ID DE CONFIG-NEGOCIO.JS
     const handleAccesoDirecto = () => {
         if (clienteAutorizado) {
             const numeroLimpio = whatsapp.replace(/\D/g, '');
             const numeroCompleto = `53${numeroLimpio}`;
             
+            // 🔥 OBTENER EL ID DESDE CONFIG-NEGOCIO.JS
             const negocioId = window.NEGOCIO_ID_POR_DEFECTO || 
                               (typeof window.getNegocioId === 'function' ? 
                                window.getNegocioId() : 
-                               '47666c9b-afa1-4286-a727-0e30f86611af');
+                               'd4f7e2b1-3a8c-4b6d-9e5f-1c2d3e4f5a6b');
             
             localStorage.setItem('negocioId', negocioId);
             
+            // También guardar nombre para el header
             if (config) {
                 localStorage.setItem('negocioNombre', config.nombre);
             }
@@ -243,41 +210,38 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
 
     if (cargando || !imagenCargada) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-100 to-amber-200">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 to-pink-200">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
             </div>
         );
     }
 
-    const colorPrimario = config?.color_primario || '#c49b63';
-    const nombreNegocio = config?.nombre || 'LAG Barberia';
-    const sticker = config?.especialidad?.toLowerCase().includes('barberia') ? '✂️' : 
-                    config?.especialidad?.toLowerCase().includes('corte') ? '💈' : 
-                    config?.especialidad?.toLowerCase().includes('barba') ? '🧔' : '✂️';
+    const colorPrimario = config?.color_primario || '#ec4899';
+    const colorSecundario = config?.color_secundario || '#f9a8d4';
+    const nombreNegocio = config?.nombre || 'Mi Salón';
+    const telefonoDuenno = config?.telefono || '55002272';
     const logoUrl = config?.logo_url;
+    const sticker = config?.especialidad?.toLowerCase().includes('uñas') ? '💅' : 
+                    config?.especialidad?.toLowerCase().includes('pelo') ? '💇‍♀️' : 
+                    config?.especialidad?.toLowerCase().includes('belleza') ? '🌸' : '💖';
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Imagen de fondo - LAG BARBERIA */}
+            {/* Imagen de fondo */}
             <div className="absolute inset-0 z-0">
                 <img 
-                    src="/lagbarberia/images/LAG.barberia.png"
-                    alt="LAG Barberia" 
+                    src="https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=2071&auto=format&fit=crop" 
+                    alt="Fondo de salón" 
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                        console.error('❌ Error cargando imagen, usando fallback');
-                        e.target.onerror = null;
-                        e.target.src = 'https://images.unsplash.com/photo-1585747860714-2ba6b8d6c5c9?q=80&w=2070&auto=format&fit=crop';
-                    }}
                 />
-                <div className="absolute inset-0 bg-black/50"></div>
+                <div className="absolute inset-0 bg-black/40"></div>
             </div>
 
             {/* Botón volver */}
             {onGoBack && (
                 <button
                     onClick={onGoBack}
-                    className="absolute top-4 left-4 z-20 w-10 h-10 bg-amber-600/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-amber-700 transition-colors border border-amber-400"
+                    className="absolute top-4 left-4 z-20 w-10 h-10 bg-pink-500/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors border border-pink-300"
                     title="Volver"
                 >
                     <i className="icon-arrow-left text-white text-xl"></i>
@@ -285,28 +249,28 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
             )}
 
             <div className="relative z-10 max-w-md w-full mx-auto">
-                <div className="bg-black/40 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-amber-500/50">
+                <div className="bg-white/20 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-pink-300/50">
                     {/* Logo o sticker */}
                     <div className="text-center mb-6">
                         {logoUrl ? (
                             <img 
                                 src={logoUrl} 
                                 alt={nombreNegocio} 
-                                className="w-20 h-20 object-contain mx-auto rounded-xl ring-4 ring-amber-500/50"
+                                className="w-20 h-20 object-contain mx-auto rounded-xl ring-4 ring-pink-300/50"
                             />
                         ) : (
-                            <div className="w-20 h-20 rounded-xl mx-auto flex items-center justify-center bg-amber-600 ring-4 ring-amber-500/50">
+                            <div className="w-20 h-20 rounded-xl mx-auto flex items-center justify-center bg-pink-500 ring-4 ring-pink-300/50">
                                 <span className="text-3xl">{sticker}</span>
                             </div>
                         )}
                         <h1 className="text-3xl font-bold text-white mt-4">{nombreNegocio}</h1>
-                        <p className="text-amber-300 mt-1">✂️ Espacio de barbería y estilo ✂️</p>
+                        <p className="text-pink-300 mt-1">🌸 Espacio de belleza y cuidado 🌸</p>
                     </div>
 
-                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center justify-center gap-2 bg-amber-600/30 p-3 rounded-lg">
-                        <span>✂️</span>
+                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center justify-center gap-2 bg-pink-500/30 p-3 rounded-lg">
+                        <span>💖</span>
                         Ingresá con tu número
-                        <span>⚡</span>
+                        <span>💖</span>
                     </h2>
                     
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -319,11 +283,11 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                 type="text"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
-                                className={`w-full px-4 py-3 rounded-lg border border-amber-400/30 bg-white/10 text-white placeholder-amber-200/70 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition ${
-                                    esAdmin || esProfesional || solicitudEnviada ? 'opacity-60 cursor-not-allowed' : ''
+                                className={`w-full px-4 py-3 rounded-lg border border-pink-300/30 bg-white/10 text-white placeholder-pink-200/70 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition ${
+                                    esAdmin || esProfesional ? 'opacity-60 cursor-not-allowed' : ''
                                 }`}
-                                placeholder="Ej: Juan Pérez"
-                                disabled={esAdmin || esProfesional || solicitudEnviada}
+                                placeholder="Ej: María Pérez"
+                                disabled={esAdmin || esProfesional}
                             />
                         </div>
 
@@ -333,7 +297,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                 Tu WhatsApp
                             </label>
                             <div className="flex">
-                                <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-amber-400/30 bg-white/10 text-amber-300 text-sm">
+                                <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-pink-300/30 bg-white/10 text-pink-300 text-sm">
                                     +53
                                 </span>
                                 <input
@@ -344,39 +308,36 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                         setWhatsapp(value);
                                         verificarNumero(value);
                                     }}
-                                    className={`w-full px-4 py-3 rounded-r-lg border border-amber-400/30 bg-white/10 text-white placeholder-amber-200/70 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition ${
-                                        esAdmin || esProfesional || solicitudEnviada ? 'opacity-60 cursor-not-allowed' : ''
-                                    }`}
+                                    className="w-full px-4 py-3 rounded-r-lg border border-pink-300/30 bg-white/10 text-white placeholder-pink-200/70 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition"
                                     placeholder="51234567"
                                     required
-                                    disabled={esAdmin || esProfesional || solicitudEnviada}
                                 />
                             </div>
-                            <p className="text-xs text-amber-300/70 mt-1">
+                            <p className="text-xs text-pink-300/70 mt-1">
                                 Ingresá tu número de WhatsApp (8 dígitos después del +53)
                             </p>
                         </div>
 
                         {/* Indicador de verificación */}
                         {verificando && (
-                            <div className="text-amber-300 text-sm bg-amber-600/20 p-2 rounded-lg flex items-center gap-2 border border-amber-400/30">
-                                <div className="animate-spin h-4 w-4 border-2 border-amber-300 border-t-transparent rounded-full"></div>
+                            <div className="text-pink-300 text-sm bg-pink-500/20 p-2 rounded-lg flex items-center gap-2 border border-pink-300/30">
+                                <div className="animate-spin h-4 w-4 border-2 border-pink-300 border-t-transparent rounded-full"></div>
                                 Verificando...
                             </div>
                         )}
 
                         {/* Mensajes según el rol detectado */}
                         {esAdmin && !verificando && (
-                            <div className="bg-amber-600/30 border border-amber-500/50 rounded-lg p-4">
+                            <div className="bg-pink-500/30 border border-pink-300/50 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                                    <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                                         A
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-white font-bold text-xl">
-                                            ¡Bienvenido Administrador!
+                                            ¡Bienvenida Administradora!
                                         </p>
-                                        <p className="text-amber-200 text-sm">
+                                        <p className="text-pink-200 text-sm">
                                             Hacé clic en el botón de abajo para acceder al panel.
                                         </p>
                                     </div>
@@ -385,16 +346,16 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                         )}
 
                         {esProfesional && profesionalInfo && !verificando && (
-                            <div className="bg-amber-600/30 border border-amber-500/50 rounded-lg p-4">
+                            <div className="bg-pink-500/30 border border-pink-300/50 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                                    <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                                         P
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-white font-bold text-xl">
                                             ¡Hola {profesionalInfo.nombre}!
                                         </p>
-                                        <p className="text-amber-200 text-sm">
+                                        <p className="text-pink-200 text-sm">
                                             Hacé clic en el botón de abajo para acceder a tu panel.
                                         </p>
                                     </div>
@@ -402,30 +363,10 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                             </div>
                         )}
 
-                        {/* Mensaje de solicitud pendiente */}
-                        {solicitudEnviada && !verificando && !esAdmin && !esProfesional && (
-                            <div className="bg-yellow-600/30 border border-yellow-500/50 rounded-lg p-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                                        ⏳
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-white font-bold text-lg">
-                                            ¡Solicitud Enviada!
-                                        </p>
-                                        <p className="text-yellow-200 text-sm">
-                                            Tu solicitud está siendo procesada. En breve recibirás confirmación cuando sea aprobada.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Mensaje de cliente autorizado */}
                         {clienteAutorizado && !verificando && !esAdmin && !esProfesional && (
-                            <div className="bg-green-600/30 border border-green-500/30 rounded-lg p-4">
+                            <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                                         C
                                     </div>
                                     <div className="flex-1">
@@ -441,7 +382,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                         )}
 
                         {/* Mensajes de error */}
-                        {error && !esAdmin && !esProfesional && !solicitudEnviada && (
+                        {error && !esAdmin && !esProfesional && (
                             <div className="text-sm p-3 rounded-lg flex items-start gap-2 bg-red-500/20 text-red-300 border border-red-500/30">
                                 <i className="icon-triangle-alert mt-0.5"></i>
                                 <span>{error}</span>
@@ -455,14 +396,14 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                     type="button"
                                     onClick={() => {
                                         localStorage.setItem('adminAuth', 'true');
-                                        localStorage.setItem('adminUser', 'Administrador');
+                                        localStorage.setItem('adminUser', 'Administradora');
                                         localStorage.setItem('adminLoginTime', Date.now());
                                         window.location.href = 'admin.html';
                                     }}
-                                    className="w-full bg-white text-amber-700 py-4 rounded-xl font-bold hover:bg-amber-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-amber-400"
+                                    className="w-full bg-white text-pink-600 py-4 rounded-xl font-bold hover:bg-pink-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-pink-300"
                                 >
                                     <span className="text-xl">⚡</span>
-                                    Ingresar como Administrador
+                                    Ingresar como Administradora
                                 </button>
                             )}
 
@@ -478,7 +419,7 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                         }));
                                         window.location.href = 'admin.html';
                                     }}
-                                    className="w-full bg-white text-amber-700 py-4 rounded-xl font-bold hover:bg-amber-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-amber-400"
+                                    className="w-full bg-white text-pink-600 py-4 rounded-xl font-bold hover:bg-pink-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-pink-300"
                                 >
                                     <span className="text-xl">✂️</span>
                                     Ingresar como Profesional
@@ -489,38 +430,31 @@ function ClientAuthScreen({ onAccessGranted, onGoBack }) {
                                 <button
                                     type="button"
                                     onClick={handleAccesoDirecto}
-                                    className="w-full bg-white text-amber-700 py-4 rounded-xl font-bold hover:bg-amber-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-amber-400"
+                                    className="w-full bg-white text-pink-600 py-4 rounded-xl font-bold hover:bg-pink-50 transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-pink-300"
                                 >
                                     <span className="text-xl">📱</span>
                                     Ingresar como Cliente
                                 </button>
                             )}
 
-                            {!clienteAutorizado && !esAdmin && !esProfesional && !solicitudEnviada && !verificando && (
+                            {!clienteAutorizado && !esAdmin && !esProfesional && !verificando && (
                                 <button
                                     type="submit"
                                     disabled={verificando}
-                                    className="w-full bg-amber-600 text-white py-4 rounded-xl font-bold hover:bg-amber-700 transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-amber-400"
+                                    className="w-full bg-pink-500 text-white py-4 rounded-xl font-bold hover:bg-pink-600 transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg text-lg border-2 border-pink-300"
                                 >
-                                    <span className="text-xl">✂️</span>
-                                    {verificando ? 'Verificando...' : 'Enviar Solicitud de Registro'}
-                                    <span className="text-xl">⚡</span>
+                                    <span className="text-xl">💅</span>
+                                    {verificando ? 'Verificando...' : 'Registrarme y Reservar'}
+                                    <span className="text-xl">✨</span>
                                 </button>
-                            )}
-
-                            {solicitudEnviada && !verificando && !esAdmin && !esProfesional && (
-                                <div className="text-center text-white/80 text-sm bg-amber-600/20 p-3 rounded-lg">
-                                    <p>✅ Solicitud enviada</p>
-                                    <p className="text-xs mt-1">Te avisaremos cuando sea aprobada</p>
-                                </div>
                             )}
                         </div>
                     </form>
 
                     {/* Stickers decorativos flotantes */}
-                    <div className="absolute -bottom-6 -right-6 text-7xl opacity-20 rotate-12 select-none">✂️</div>
-                    <div className="absolute -top-6 -left-6 text-7xl opacity-20 -rotate-12 select-none">💈</div>
-                    <div className="absolute top-1/2 -translate-y-1/2 -right-8 text-5xl opacity-10 select-none">⚡</div>
+                    <div className="absolute -bottom-6 -right-6 text-7xl opacity-20 rotate-12 select-none">💇‍♀️</div>
+                    <div className="absolute -top-6 -left-6 text-7xl opacity-20 -rotate-12 select-none">💅</div>
+                    <div className="absolute top-1/2 -translate-y-1/2 -right-8 text-5xl opacity-10 select-none">🌸</div>
                 </div>
             </div>
         </div>
