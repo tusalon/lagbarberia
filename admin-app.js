@@ -1288,15 +1288,16 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                        {/* BOTÓN NUEVA RESERVA - Visible para todos */}
-                        <button
-                            onClick={abrirModalNuevaReserva}
-                            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-green-400 flex-1 sm:flex-none justify-center"
-                        >
-                            <span className="text-lg">📅</span>
-                            <span className="font-medium">Nueva Reserva</span>
-                        </button>
-
+                        {/* BOTÓN NUEVA RESERVA - SOLO ADMIN O NIVEL 3 */}
+{(userRole === 'admin' || userNivel >= 3) && (
+    <button
+        onClick={abrirModalNuevaReserva}
+        className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-green-400 flex-1 sm:flex-none justify-center"
+    >
+        <span className="text-lg">📅</span>
+        <span className="font-medium">Nueva Reserva</span>
+    </button>
+)}
                         {/* BOTÓN CALENDARIO DE DISPONIBILIDAD - Visible para todos */}
                         <button
                             onClick={abrirModalDisponibilidad}
