@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso al Panel</title>
     
-    <!-- Tailwind desde CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- bcryptjs con asignación explícita -->
     <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
     <script>
-        // Forzar la asignación global si es necesario
         window.addEventListener('load', function() {
             if (typeof bcrypt === 'undefined') {
                 if (typeof dcodeIO !== 'undefined' && dcodeIO.bcrypt) {
@@ -19,7 +15,6 @@
                     console.log('✅ bcrypt asignado desde dcodeIO');
                 } else {
                     console.error('❌ No se pudo cargar bcrypt');
-                    // Crear un polyfill simple para pruebas (NO USAR EN PRODUCCIÓN)
                     window.bcrypt = {
                         compareSync: function(password, hash) {
                             console.warn('⚠️ Usando comparación SIMULADA - SOLO PRUEBAS');
@@ -103,8 +98,11 @@
                 // 1️⃣ PRIMERO: Verificar si es un PROFESIONAL
                 console.log('🔍 Buscando profesional:', username);
                 
+                // Obtener TODOS los profesionales del negocio (para evitar problemas de espacios)
+                const negocioId = '1dc5adc6-ed9e-4931-833f-4f71645c9ef3';
+                
                 const profResponse = await fetch(
-                    `${window.SUPABASE_URL}/rest/v1/profesionales?nombre=ilike.${encodeURIComponent(username)}&select=*`,
+                    `${window.SUPABASE_URL}/rest/v1/profesionales?negocio_id=eq.${negocioId}&select=*`,
                     {
                         headers: {
                             'apikey': window.SUPABASE_ANON_KEY,
@@ -115,23 +113,24 @@
                 
                 if (profResponse.ok) {
                     const profesionales = await profResponse.json();
+                    console.log('📋 Profesionales encontrados:', profesionales.length);
                     
-                    if (profesionales && profesionales.length > 0) {
-                        const profesional = profesionales[0];
-                        
+                    // Buscar haciendo trim() en ambos lados para ignorar espacios
+                    const profesional = profesionales.find(p => 
+                        p.nombre && p.nombre.trim().toLowerCase() === username.toLowerCase()
+                    );
+                    
+                    if (profesional) {
                         console.log('✅ Profesional encontrado:', profesional.nombre);
                         console.log('📊 Nivel:', profesional.nivel);
-                        console.log('🔑 Password esperado:', profesional.password);
-                        console.log('🔑 Password ingresado:', password);
                         
-                        // Verificar contraseña (comparación directa)
+                        // Verificar contraseña
                         if (profesional.password === password) {
                             console.log('✅ Login como profesional exitoso:', profesional.nombre);
                             
-                            // Guardar datos del profesional
                             localStorage.setItem('profesionalAuth', JSON.stringify({
                                 id: profesional.id,
-                                nombre: profesional.nombre,
+                                nombre: profesional.nombre.trim(),
                                 nivel: profesional.nivel || 1,
                                 negocio_id: profesional.negocio_id,
                                 activo: profesional.activo
@@ -139,7 +138,6 @@
                             localStorage.setItem('negocioId', profesional.negocio_id);
                             localStorage.setItem('userRole', 'profesional');
                             
-                            // Limpiar cualquier sesión de admin previa
                             localStorage.removeItem('adminAuth');
                             localStorage.removeItem('adminLoginTime');
                             
@@ -156,11 +154,9 @@
                     } else {
                         console.log('❌ No se encontró profesional con ese nombre');
                     }
-                } else {
-                    console.log('⚠️ Error en consulta de profesionales:', profResponse.status);
                 }
                 
-                // 2️⃣ SEGUNDO: Si no es profesional, verificar si es ADMIN (negocio)
+                // 2️⃣ SEGUNDO: Verificar si es ADMIN (negocio)
                 console.log('🔍 Buscando negocio con slug:', username.toLowerCase());
                 
                 const response = await fetch(
@@ -213,7 +209,6 @@
                 
                 console.log('✅ Login exitoso como ADMIN:', negocio.nombre);
                 
-                // Guardar datos del admin
                 localStorage.setItem('negocioId', negocio.id);
                 localStorage.setItem('negocioSlug', negocio.slug);
                 localStorage.setItem('negocioNombre', negocio.nombre);
@@ -221,20 +216,17 @@
                 localStorage.setItem('adminLoginTime', Date.now());
                 localStorage.setItem('userRole', 'admin');
                 
-                // Limpiar cualquier sesión de profesional previa
                 localStorage.removeItem('profesionalAuth');
                 
                 if (!negocio.configurado) {
-                    console.log('🔄 Primera vez, redirigiendo al wizard');
                     window.location.href = 'setup-wizard.html';
                 } else {
-                    console.log('➡️ Negocio ya configurado, yendo al panel');
                     window.location.href = 'admin.html';
                 }
                 
             } catch (error) {
                 console.error('❌ Error:', error);
-                errorMsg.textContent = error.message || 'Error al conectar. Intentá de nuevo.';
+                errorMsg.textContent = 'Error al conectar. Intentá de nuevo.';
                 errorMsg.classList.remove('hidden');
                 mensaje.classList.add('hidden');
             }
