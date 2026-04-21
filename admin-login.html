@@ -63,7 +63,7 @@
                 <label class="block text-sm font-medium text-amber-400 mb-2">Usuario</label>
                 <input type="text" id="username" required
                        class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                       placeholder="bennetsalon">
+                       placeholder="Nombre de profesional o slug del negocio">
             </div>
             
             <div>
@@ -88,7 +88,7 @@
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('username').value.trim().toLowerCase();
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             const errorMsg = document.getElementById('errorMsg');
             const mensaje = document.getElementById('mensaje');
@@ -100,13 +100,71 @@
             mensaje.classList.remove('hidden');
             
             try {
-                // Verificar que bcrypt está disponible
-                if (typeof bcrypt === 'undefined') {
-                    throw new Error('bcrypt no está cargado');
+                // 1️⃣ PRIMERO: Verificar si es un PROFESIONAL
+                console.log('🔍 Buscando profesional:', username);
+                
+                const profResponse = await fetch(
+                    `${window.SUPABASE_URL}/rest/v1/profesionales?nombre=ilike.${encodeURIComponent(username)}&select=*`,
+                    {
+                        headers: {
+                            'apikey': window.SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+                        }
+                    }
+                );
+                
+                if (profResponse.ok) {
+                    const profesionales = await profResponse.json();
+                    
+                    if (profesionales && profesionales.length > 0) {
+                        const profesional = profesionales[0];
+                        
+                        console.log('✅ Profesional encontrado:', profesional.nombre);
+                        console.log('📊 Nivel:', profesional.nivel);
+                        console.log('🔑 Password esperado:', profesional.password);
+                        console.log('🔑 Password ingresado:', password);
+                        
+                        // Verificar contraseña (comparación directa)
+                        if (profesional.password === password) {
+                            console.log('✅ Login como profesional exitoso:', profesional.nombre);
+                            
+                            // Guardar datos del profesional
+                            localStorage.setItem('profesionalAuth', JSON.stringify({
+                                id: profesional.id,
+                                nombre: profesional.nombre,
+                                nivel: profesional.nivel || 1,
+                                negocio_id: profesional.negocio_id,
+                                activo: profesional.activo
+                            }));
+                            localStorage.setItem('negocioId', profesional.negocio_id);
+                            localStorage.setItem('userRole', 'profesional');
+                            
+                            // Limpiar cualquier sesión de admin previa
+                            localStorage.removeItem('adminAuth');
+                            localStorage.removeItem('adminLoginTime');
+                            
+                            console.log('➡️ Redirigiendo a admin.html como profesional');
+                            window.location.href = 'admin.html';
+                            return;
+                        } else {
+                            console.log('❌ Contraseña incorrecta para profesional');
+                            errorMsg.textContent = 'Contraseña incorrecta';
+                            errorMsg.classList.remove('hidden');
+                            mensaje.classList.add('hidden');
+                            return;
+                        }
+                    } else {
+                        console.log('❌ No se encontró profesional con ese nombre');
+                    }
+                } else {
+                    console.log('⚠️ Error en consulta de profesionales:', profResponse.status);
                 }
-
+                
+                // 2️⃣ SEGUNDO: Si no es profesional, verificar si es ADMIN (negocio)
+                console.log('🔍 Buscando negocio con slug:', username.toLowerCase());
+                
                 const response = await fetch(
-                    `${window.SUPABASE_URL}/rest/v1/negocios?slug=eq.${username}&select=*`,
+                    `${window.SUPABASE_URL}/rest/v1/negocios?slug=eq.${username.toLowerCase()}&select=*`,
                     {
                         headers: {
                             'apikey': window.SUPABASE_ANON_KEY,
@@ -122,6 +180,7 @@
                 const negocios = await response.json();
                 
                 if (!negocios || negocios.length === 0) {
+                    console.log('❌ Negocio no encontrado');
                     errorMsg.textContent = 'Usuario no encontrado';
                     errorMsg.classList.remove('hidden');
                     mensaje.classList.add('hidden');
@@ -129,32 +188,41 @@
                 }
                 
                 const negocio = negocios[0];
+                console.log('✅ Negocio encontrado:', negocio.nombre);
                 
-                // Verificar contraseña con bcrypt
-                try {
-                    const passwordValida = bcrypt.compareSync(password, negocio.password_hash);
-                    
-                    if (!passwordValida) {
-                        errorMsg.textContent = 'Contraseña incorrecta';
+                // Verificar contraseña con bcrypt para admin
+                if (typeof bcrypt !== 'undefined') {
+                    try {
+                        const passwordValida = bcrypt.compareSync(password, negocio.password_hash);
+                        
+                        if (!passwordValida) {
+                            console.log('❌ Contraseña incorrecta para admin');
+                            errorMsg.textContent = 'Contraseña incorrecta';
+                            errorMsg.classList.remove('hidden');
+                            mensaje.classList.add('hidden');
+                            return;
+                        }
+                    } catch (bcryptError) {
+                        console.error('❌ Error en bcrypt:', bcryptError);
+                        errorMsg.textContent = 'Error al verificar contraseña';
                         errorMsg.classList.remove('hidden');
                         mensaje.classList.add('hidden');
                         return;
                     }
-                } catch (bcryptError) {
-                    console.error('Error en bcrypt:', bcryptError);
-                    errorMsg.textContent = 'Error al verificar contraseña';
-                    errorMsg.classList.remove('hidden');
-                    mensaje.classList.add('hidden');
-                    return;
                 }
                 
-                console.log('✅ Login exitoso:', negocio.nombre);
+                console.log('✅ Login exitoso como ADMIN:', negocio.nombre);
                 
+                // Guardar datos del admin
                 localStorage.setItem('negocioId', negocio.id);
                 localStorage.setItem('negocioSlug', negocio.slug);
                 localStorage.setItem('negocioNombre', negocio.nombre);
                 localStorage.setItem('adminAuth', 'true');
                 localStorage.setItem('adminLoginTime', Date.now());
+                localStorage.setItem('userRole', 'admin');
+                
+                // Limpiar cualquier sesión de profesional previa
+                localStorage.removeItem('profesionalAuth');
                 
                 if (!negocio.configurado) {
                     console.log('🔄 Primera vez, redirigiendo al wizard');
