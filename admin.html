@@ -36,22 +36,40 @@
 
     <script>
         (function() {
+            console.log('🔍 ADMIN.HTML - Verificando sesión...');
+            console.log('📦 localStorage keys:', Object.keys(localStorage));
+            console.log('   negocioId:', localStorage.getItem('negocioId'));
+            console.log('   profesionalAuth:', localStorage.getItem('profesionalAuth') ? 'presente' : 'ausente');
+            console.log('   adminAuth:', localStorage.getItem('adminAuth'));
+            console.log('   userRole:', localStorage.getItem('userRole'));
+            
             const negocioId = localStorage.getItem('negocioId');
+            const profesionalAuth = localStorage.getItem('profesionalAuth');
             
             if (!negocioId) {
-                console.log('🚫 No hay sesión, redirigiendo a login');
+                console.log('🚫 No hay negocioId, redirigiendo a login');
                 window.location.href = 'admin-login.html';
                 return;
             }
             
-            // Verificar sesión (8 horas)
+            // Si es profesional, no necesita validar adminLoginTime
+            if (profesionalAuth) {
+                console.log('✅ Sesión de profesional detectada, continuando...');
+                return;
+            }
+            
+            // Para admin, verificar tiempo de sesión (8 horas)
             const loginTime = localStorage.getItem('adminLoginTime');
             const isValidSession = loginTime && (Date.now() - parseInt(loginTime)) < 8 * 60 * 60 * 1000;
             
             if (!isValidSession) {
+                console.log('⏰ Sesión de admin expirada o inválida');
                 localStorage.clear();
                 window.location.href = 'admin-login.html';
+                return;
             }
+            
+            console.log('✅ Sesión de admin válida, cargando panel...');
         })();
     </script>
 </body>

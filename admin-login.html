@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso al Panel</title>
     
+    <!-- Tailwind desde CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- bcryptjs con asignación explícita -->
     <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
     <script>
         window.addEventListener('load', function() {
@@ -95,10 +98,8 @@
             mensaje.classList.remove('hidden');
             
             try {
-                // 1️⃣ PRIMERO: Verificar si es un PROFESIONAL
                 console.log('🔍 Buscando profesional:', username);
                 
-                // Obtener TODOS los profesionales del negocio (para evitar problemas de espacios)
                 const negocioId = '1dc5adc6-ed9e-4931-833f-4f71645c9ef3';
                 
                 const profResponse = await fetch(
@@ -113,9 +114,8 @@
                 
                 if (profResponse.ok) {
                     const profesionales = await profResponse.json();
-                    console.log('📋 Profesionales encontrados:', profesionales.length);
+                    console.log('📋 Profesionales cargados:', profesionales.length);
                     
-                    // Buscar haciendo trim() en ambos lados para ignorar espacios
                     const profesional = profesionales.find(p => 
                         p.nombre && p.nombre.trim().toLowerCase() === username.toLowerCase()
                     );
@@ -124,25 +124,29 @@
                         console.log('✅ Profesional encontrado:', profesional.nombre);
                         console.log('📊 Nivel:', profesional.nivel);
                         
-                        // Verificar contraseña
                         if (profesional.password === password) {
-                            console.log('✅ Login como profesional exitoso:', profesional.nombre);
+                            console.log('✅ Contraseña correcta - Login como profesional');
                             
-                            localStorage.setItem('profesionalAuth', JSON.stringify({
+                            const profesionalData = {
                                 id: profesional.id,
                                 nombre: profesional.nombre.trim(),
                                 nivel: profesional.nivel || 1,
                                 negocio_id: profesional.negocio_id,
                                 activo: profesional.activo
-                            }));
+                            };
+                            
+                            localStorage.setItem('profesionalAuth', JSON.stringify(profesionalData));
                             localStorage.setItem('negocioId', profesional.negocio_id);
                             localStorage.setItem('userRole', 'profesional');
                             
                             localStorage.removeItem('adminAuth');
                             localStorage.removeItem('adminLoginTime');
                             
-                            console.log('➡️ Redirigiendo a admin.html como profesional');
-                            window.location.href = 'admin.html';
+                            console.log('📦 Datos guardados en localStorage');
+                            
+                            setTimeout(() => {
+                                window.location.href = 'admin.html';
+                            }, 100);
                             return;
                         } else {
                             console.log('❌ Contraseña incorrecta para profesional');
@@ -152,11 +156,10 @@
                             return;
                         }
                     } else {
-                        console.log('❌ No se encontró profesional con ese nombre');
+                        console.log('❌ Profesional no encontrado con ese nombre');
                     }
                 }
                 
-                // 2️⃣ SEGUNDO: Verificar si es ADMIN (negocio)
                 console.log('🔍 Buscando negocio con slug:', username.toLowerCase());
                 
                 const response = await fetch(
@@ -186,7 +189,6 @@
                 const negocio = negocios[0];
                 console.log('✅ Negocio encontrado:', negocio.nombre);
                 
-                // Verificar contraseña con bcrypt para admin
                 if (typeof bcrypt !== 'undefined') {
                     try {
                         const passwordValida = bcrypt.compareSync(password, negocio.password_hash);
@@ -218,11 +220,13 @@
                 
                 localStorage.removeItem('profesionalAuth');
                 
-                if (!negocio.configurado) {
-                    window.location.href = 'setup-wizard.html';
-                } else {
-                    window.location.href = 'admin.html';
-                }
+                setTimeout(() => {
+                    if (!negocio.configurado) {
+                        window.location.href = 'setup-wizard.html';
+                    } else {
+                        window.location.href = 'admin.html';
+                    }
+                }, 100);
                 
             } catch (error) {
                 console.error('❌ Error:', error);
