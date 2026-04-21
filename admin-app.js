@@ -1,6 +1,7 @@
 // admin-app.js - Panel de administración (VERSIÓN GENÉRICA)
 // CON BOTÓN DE NUEVA RESERVA MANUAL, CALENDARIO DE DISPONIBILIDAD
 // SIN DEPENDENCIA DE dias-cerrados.js - OBTIENE DÍAS CERRADOS DIRECTAMENTE DE SUPABASE
+// CORREGIDO: Profesionales solo ven sus reservas, pestañas restringidas por nivel
 
 console.log('🚀 ADMIN-APP.JS - Panel de administración con Nueva Reserva y Calendario Disponibilidad');
 
@@ -335,7 +336,7 @@ function AdminApp() {
         requiereAnticipo: false
     });
     
-    // 🔥 Estado para el modal de disponibilidad
+    // Estado para el modal de disponibilidad
     const [showDisponibilidadModal, setShowDisponibilidadModal] = React.useState(false);
     const [disponibilidadFecha, setDisponibilidadFecha] = React.useState(new Date());
     const [disponibilidadHoras, setDisponibilidadHoras] = React.useState([]);
@@ -445,7 +446,7 @@ function AdminApp() {
         cargarDatosModal();
     }, []);
 
-    // 🔥 CARGAR DÍAS CERRADOS AL INICIO
+    // CARGAR DÍAS CERRADOS AL INICIO
     React.useEffect(() => {
         cargarDiasCerradosDirecto();
     }, []);
@@ -466,7 +467,7 @@ function AdminApp() {
         cargarDiasLaborales();
     }, [nuevaReservaData.profesional_id]);
 
-    // 🔥 CARGAR DÍAS CERRADOS CUANDO SE ABRE EL MODAL
+    // CARGAR DÍAS CERRADOS CUANDO SE ABRE EL MODAL
     React.useEffect(() => {
         if (showNuevaReservaModal) {
             cargarDiasCerradosDirecto();
@@ -622,7 +623,7 @@ function AdminApp() {
         }
     };
 
-    // 🔥 FUNCIÓN PARA CARGAR DISPONIBILIDAD DEL MES EN EL MODAL
+    // FUNCIÓN PARA CARGAR DISPONIBILIDAD DEL MES EN EL MODAL
     const cargarDisponibilidadDelMes = async (fecha, profesionalId = null) => {
         if (!profesionalId && profesionalesList.length > 0) {
             profesionalId = profesionalesList[0]?.id;
@@ -941,11 +942,18 @@ function AdminApp() {
         console.log('🔄 fetchBookings - INICIANDO CARGA');
         setLoading(true);
         try {
-            let data;
+            let data = [];
             
             if (userRole === 'profesional' && profesional) {
                 console.log(`📋 Cargando reservas de profesional ${profesional.id}...`);
-                data = await window.getReservasPorProfesional?.(profesional.id, false) || [];
+                // SOLO usar getReservasPorProfesional, sin fallback
+                if (typeof window.getReservasPorProfesional === 'function') {
+                    data = await window.getReservasPorProfesional(profesional.id, false);
+                    console.log('📊 Reservas del profesional:', data?.length || 0);
+                } else {
+                    console.error('❌ getReservasPorProfesional no está definida');
+                    data = [];
+                }
             } else {
                 console.log('📋 Llamando a getAllBookings...');
                 data = await getAllBookings();
@@ -958,17 +966,22 @@ function AdminApp() {
                 
                 await marcarTurnosCompletados();
                 
+                // Recargar después de marcar completados
                 if (userRole === 'profesional' && profesional) {
-                    data = await window.getReservasPorProfesional?.(profesional.id, false) || [];
+                    if (typeof window.getReservasPorProfesional === 'function') {
+                        data = await window.getReservasPorProfesional(profesional.id, false);
+                    }
                 } else {
                     data = await getAllBookings();
                 }
                 
                 console.log('✅ RESERVAS CARGADAS:', data.length);
-                console.log('📅 Rango de fechas:', {
-                    primera: data.length > 0 ? data[data.length-1]?.fecha : 'sin datos',
-                    ultima: data.length > 0 ? data[0]?.fecha : 'sin datos'
-                });
+                if (data.length > 0) {
+                    console.log('📅 Rango de fechas:', {
+                        primera: data[data.length-1]?.fecha,
+                        ultima: data[0]?.fecha
+                    });
+                }
                 
                 setBookings(Array.isArray(data) ? data : []);
             } else {
@@ -1188,27 +1201,31 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
     const canceladasCount = bookings.filter(b => b.estado === 'Cancelado').length;
     const filteredBookings = getFilteredBookings();
 
-   const getTabsDisponibles = () => {
-    const tabs = [];
-    tabs.push({ id: 'reservas', icono: '📅', label: userRole === 'profesional' ? 'Mis Reservas' : 'Reservas' });
-    
-    // 🔥 NUEVA PESTAÑA DE SOLICITUDES
-    if (userRole === 'admin' || (userRole === 'profesional' && userNivel >= 2)) {
-        tabs.push({ id: 'solicitudes', icono: '📋', label: 'Solicitudes' });
-    }
-    
-    if (userRole === 'admin' || (userRole === 'profesional' && userNivel >= 2)) {
-        tabs.push({ id: 'configuracion', icono: '⚙️', label: 'Configuración' });
-        tabs.push({ id: 'clientes', icono: '👤', label: 'Clientes' });
-    }
-    
-    if (userRole === 'admin' || (userRole === 'profesional' && userNivel >= 3)) {
-        tabs.push({ id: 'servicios', icono: '💈', label: 'Servicios' });
-        tabs.push({ id: 'profesionales', icono: '👥', label: 'Profesionales' });
-    }
-    
-    return tabs;
-};
+    // ============================================
+    // PESTAÑAS DISPONIBLES SEGÚN ROL Y NIVEL
+    // ============================================
+    const getTabsDisponibles = () => {
+        const tabs = [];
+        
+        // TODOS los roles ven sus reservas
+        tabs.push({ id: 'reservas', icono: '📅', label: userRole === 'profesional' ? 'Mis Reservas' : 'Reservas' });
+        
+        // Nivel 2+: Solicitudes y Configuración y Clientes
+        if (userRole === 'admin' || (userRole === 'profesional' && userNivel >= 2)) {
+            tabs.push({ id: 'solicitudes', icono: '📋', label: 'Solicitudes' });
+            tabs.push({ id: 'configuracion', icono: '⚙️', label: 'Configuración' });
+            tabs.push({ id: 'clientes', icono: '👤', label: 'Clientes' });
+        }
+        
+        // Nivel 3 (admin o profesional avanzado): Servicios y Profesionales
+        if (userRole === 'admin' || (userRole === 'profesional' && userNivel >= 3)) {
+            tabs.push({ id: 'servicios', icono: '💈', label: 'Servicios' });
+            tabs.push({ id: 'profesionales', icono: '👥', label: 'Profesionales' });
+        }
+        
+        return tabs;
+    };
+
     const abrirModalNuevaReserva = () => {
         setNuevaReservaData({
             cliente_nombre: '',
@@ -1264,12 +1281,14 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         )}
                         <div>
                             <h1 className="text-xl font-bold text-pink-800">{nombreNegocio}</h1>
-                            <p className="text-xs text-pink-500">Panel de Administración</p>
+                            <p className="text-xs text-pink-500">
+                                {userRole === 'profesional' ? `Panel de ${profesional?.nombre || 'Profesional'}` : 'Panel de Administración'}
+                            </p>
                         </div>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                        {/* 🔥 BOTÓN NUEVA RESERVA */}
+                        {/* BOTÓN NUEVA RESERVA - Visible para todos */}
                         <button
                             onClick={abrirModalNuevaReserva}
                             className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-green-400 flex-1 sm:flex-none justify-center"
@@ -1278,7 +1297,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                             <span className="font-medium">Nueva Reserva</span>
                         </button>
 
-                        {/* 🔥 BOTÓN CALENDARIO DE DISPONIBILIDAD */}
+                        {/* BOTÓN CALENDARIO DE DISPONIBILIDAD - Visible para todos */}
                         <button
                             onClick={abrirModalDisponibilidad}
                             className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-blue-400 flex-1 sm:flex-none justify-center"
@@ -1288,13 +1307,16 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                             <span className="font-medium">Ver Disponibilidad</span>
                         </button>
 
-                        <button
-                            onClick={() => window.location.href = 'editar-negocio.html'}
-                            className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-pink-400 flex-1 sm:flex-none justify-center"
-                        >
-                            <span className="text-lg">💖</span>
-                            <span className="font-medium">Editar Negocio</span>
-                        </button>
+                        {/* BOTÓN EDITAR NEGOCIO - SOLO ADMIN O NIVEL 3 */}
+                        {(userRole === 'admin' || userNivel >= 3) && (
+                            <button
+                                onClick={() => window.location.href = 'editar-negocio.html'}
+                                className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-pink-400 flex-1 sm:flex-none justify-center"
+                            >
+                                <span className="text-lg">💖</span>
+                                <span className="font-medium">Editar Negocio</span>
+                            </button>
+                        )}
 
                         <button 
                             onClick={() => {
@@ -1354,12 +1376,20 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Profesional *</label>
-                                    <select value={nuevaReservaData.profesional_id} onChange={(e) => setNuevaReservaData({...nuevaReservaData, profesional_id: e.target.value})} className="w-full border rounded-lg px-3 py-2">
+                                    <select 
+                                        value={nuevaReservaData.profesional_id} 
+                                        onChange={(e) => setNuevaReservaData({...nuevaReservaData, profesional_id: e.target.value})} 
+                                        className="w-full border rounded-lg px-3 py-2"
+                                        disabled={userRole === 'profesional'}
+                                    >
                                         <option value="">Seleccionar profesional</option>
                                         {profesionalesList.map(p => (<option key={p.id} value={p.id}>{p.nombre} - {p.especialidad}</option>))}
                                     </select>
+                                    {userRole === 'profesional' && (
+                                        <p className="text-xs text-gray-500 mt-1">Solo puedes asignarte reservas a ti mismo</p>
+                                    )}
                                 </div>
-                                {userRole === 'admin' && (
+                                {(userRole === 'admin' || userNivel >= 2) && (
                                     <div className="flex items-center gap-3 bg-yellow-50 p-3 rounded-lg">
                                         <input type="checkbox" id="requiereAnticipo" checked={nuevaReservaData.requiereAnticipo} onChange={(e) => setNuevaReservaData({...nuevaReservaData, requiereAnticipo: e.target.checked})} />
                                         <label htmlFor="requiereAnticipo" className="text-sm font-medium text-yellow-800">💰 Requerir anticipo al cliente</label>
@@ -1435,7 +1465,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 <button onClick={() => setShowDisponibilidadModal(false)} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
                             </div>
                             
-                            {userRole === 'admin' && profesionalesList.length > 0 && (
+                            {(userRole === 'admin' || userNivel >= 2) && profesionalesList.length > 0 && (
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Profesional:</label>
                                     <select
@@ -1517,14 +1547,14 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                 </div>
 
                 {/* CONTENIDO */}
-                {tabActivo === 'configuracion' && (
+                {tabActivo === 'configuracion' && (userRole === 'admin' || userNivel >= 2) && (
                     <ConfigPanel profesionalId={userRole === 'profesional' ? profesional?.id : null} modoRestringido={userRole === 'profesional' && userNivel === 2} />
                 )}
                 
-                 {/* 🔥 NUEVA PESTAÑA: SOLICITUDES */}
-{tabActivo === 'solicitudes' && (userRole === 'admin' || userNivel >= 2) && (
-    <SolicitudesPanel onActualizar={fetchBookings} />
-)}
+                {/* PESTAÑA: SOLICITUDES */}
+                {tabActivo === 'solicitudes' && (userRole === 'admin' || userNivel >= 2) && (
+                    <SolicitudesPanel onActualizar={fetchBookings} />
+                )}
 
                 {tabActivo === 'servicios' && (userRole === 'admin' || userNivel >= 3) && (
                     <ServiciosPanel />
@@ -1577,7 +1607,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 <button onClick={() => setStatusFilter('completadas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'completadas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Completadas ({completadasCount})</button>
                                 <button onClick={() => setStatusFilter('canceladas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'canceladas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Canceladas ({canceladasCount})</button>
                                 <button onClick={() => setStatusFilter('todas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'todas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Todas ({bookings.length})</button>
-                                {statusFilter === 'canceladas' && (
+                                {(userRole === 'admin' || userNivel >= 2) && statusFilter === 'canceladas' && (
                                     <button onClick={borrarCanceladas} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm">🗑️ Borrar todas</button>
                                 )}
                             </div>
@@ -1612,7 +1642,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                     {b.estado}
                                                 </span>
                                                 <div className="flex gap-2">
-                                                    {b.estado === 'Pendiente' && (
+                                                    {(userRole === 'admin' || userNivel >= 2) && b.estado === 'Pendiente' && (
                                                         <button onClick={() => confirmarPago(b.id, b)} className="px-3 py-1 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">✅ Confirmar pago</button>
                                                     )}
                                                     {b.estado === 'Reservado' && (
