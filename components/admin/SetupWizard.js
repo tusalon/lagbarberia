@@ -1,4 +1,4 @@
-// components/admin/SetupWizard.js
+﻿// components/admin/SetupWizard.js
 
 function SetupWizard() {
     const [step, setStep] = React.useState(1);
@@ -21,7 +21,7 @@ function SetupWizard() {
         logo_preview: '',
         
         // Paso 3: Mensajes
-        mensaje_bienvenida: '¡Bienvenido a nuestro salón!',
+        mensaje_bienvenida: '¡Bienvenido a nuestra barbería!',
         mensaje_confirmacion: 'Tu turno ha sido reservado con éxito',
         
         // Paso 4: Redes
@@ -493,7 +493,7 @@ function SetupWizard() {
                                 onChange={(e) => setConfig({...config, mensaje_bienvenida: e.target.value})}
                                 className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                                 rows="3"
-                                placeholder="¡Bienvenido a nuestro salón!"
+                                placeholder="¡Bienvenido a nuestra barbería!"
                             />
                             <p className="text-xs text-gray-400 mt-1">Se muestra al abrir la app</p>
                         </div>

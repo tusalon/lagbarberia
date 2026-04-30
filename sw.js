@@ -1,6 +1,6 @@
-// sw.js - Service Worker para LAG Barberia
+﻿// sw.js - Service Worker para LAG Barberia
 
-const CACHE_NAME = 'lag-barberia-v1';
+const CACHE_NAME = 'lag-barberia-v2';
 const urlsToCache = [
   '/lagbarberia/',
   '/lagbarberia/index.html',
@@ -9,6 +9,7 @@ const urlsToCache = [
   '/lagbarberia/setup-wizard.html',
   '/lagbarberia/editar-negocio.html',
   '/lagbarberia/manifest.json',
+  '/lagbarberia/images/LAG.barberia.jpg',
   '/lagbarberia/icons/icon-72x72.png',
   '/lagbarberia/icons/icon-96x96.png',
   '/lagbarberia/icons/icon-128x128.png',
@@ -79,7 +80,6 @@ self.addEventListener('fetch', event => {
   // Ignorar otras APIs externas
   if (event.request.url.includes('supabase.co')) return;
   if (event.request.url.includes('ntfy.sh')) return;
-  if (event.request.url.includes('unsplash.com')) return;
   if (event.request.url.includes('cdn.') || 
       event.request.url.includes('unpkg.com') || 
       event.request.url.includes('trickle.so')) {

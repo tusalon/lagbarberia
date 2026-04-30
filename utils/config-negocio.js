@@ -1,4 +1,4 @@
-// utils/config-negocio.js - VERSIÓN MULTI-TENANT CORREGIDA
+﻿// utils/config-negocio.js - VERSIÓN MULTI-TENANT CORREGIDA
 // CLIENTE: LAG Barberia
 
 console.log('🏢 config-negocio.js cargado');
@@ -10,6 +10,12 @@ const NEGOCIO_ID_POR_DEFECTO = '1dc5adc6-ed9e-4931-833f-4f71645c9ef3'; // ID de 
 
 // Hacer accesible globalmente
 window.NEGOCIO_ID_POR_DEFECTO = NEGOCIO_ID_POR_DEFECTO;
+try {
+    localStorage.setItem('negocioId', NEGOCIO_ID_POR_DEFECTO);
+    localStorage.setItem('negocioNombre', 'LAG Barberia');
+} catch (error) {
+    console.warn('No se pudo fijar negocioId en localStorage:', error);
+}
 
 // ============================================
 // FUNCIONES PARA OBTENER EL ID (GLOBALES)
@@ -31,15 +37,16 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutos
  * Obtiene el negocio_id del localStorage o usa el ID por defecto
  */
 function getNegocioId() {
-    // 1. Prioridad: lo que haya en localStorage (cuando el admin se loguea)
-    const localId = localStorage.getItem('negocioId');
-    if (localId) {
-        console.log('📌 Usando negocioId de localStorage:', localId);
-        return localId;
+    try {
+        const localId = localStorage.getItem('negocioId');
+        if (localId !== NEGOCIO_ID_POR_DEFECTO) {
+            console.log('📌 Corrigiendo negocioId local:', localId, '=>', NEGOCIO_ID_POR_DEFECTO);
+            localStorage.setItem('negocioId', NEGOCIO_ID_POR_DEFECTO);
+        }
+    } catch (error) {
+        console.warn('No se pudo leer negocioId local:', error);
     }
-    
-    // 2. Si no, usar el ID por defecto
-    console.log('📌 Usando negocioId por defecto (quemado en código):', NEGOCIO_ID_POR_DEFECTO);
+    console.log('📌 Usando negocioId de LAG Barberia:', NEGOCIO_ID_POR_DEFECTO);
     return NEGOCIO_ID_POR_DEFECTO;
 }
 

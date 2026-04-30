@@ -1,4 +1,4 @@
-// components/WelcomeScreen.js - Versión con REDES SOCIALES (CORREGIDA - SIN DESBORDAMIENTO)
+﻿// components/WelcomeScreen.js - Versión con REDES SOCIALES (CORREGIDA - SIN DESBORDAMIENTO)
 
 function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
     const [config, setConfig] = React.useState(null);
@@ -16,22 +16,22 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
 
         // Precargar la imagen de fondo
         const img = new Image();
-        img.src = 'https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=2071&auto=format&fit=crop';
+        img.src = 'images/LAG.barberia.jpg';
         img.onload = () => setImagenCargada(true);
     }, []);
 
     if (cargando || !imagenCargada) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-pink-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+            <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
             </div>
         );
     }
 
-    const colorPrimario = config?.color_primario || '#ec4899';
-    const sticker = config?.especialidad?.toLowerCase().includes('uñas') ? '💅' : 
-                    config?.especialidad?.toLowerCase().includes('pelo') ? '💇‍♀️' : 
-                    config?.especialidad?.toLowerCase().includes('belleza') ? '🌸' : '💖';
+    const colorPrimario = config?.color_primario || '#8b5a2b';
+    const sticker = config?.especialidad?.toLowerCase().includes('uñas') ? '✂️' : 
+                    config?.especialidad?.toLowerCase().includes('pelo') ? '💇' : 
+                    config?.especialidad?.toLowerCase().includes('barber') ? '💈' : '🪒';
 
     // ============================================
     // FUNCIONES PARA ABRIR REDES SOCIALES
@@ -44,7 +44,7 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
         }
         
         const telefonoLimpio = config.telefono.replace(/\D/g, '');
-        const mensaje = encodeURIComponent(`Hola! Quiero consultar sobre turnos en ${config?.nombre || 'el salón'}`);
+        const mensaje = encodeURIComponent(`Hola! Quiero consultar sobre turnos en ${config?.nombre || 'la barbería'}`);
         
         // Abrir WhatsApp
         window.open(`https://wa.me/${telefonoLimpio}?text=${mensaje}`, '_blank');
@@ -110,8 +110,8 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
             {/* Imagen de fondo fija */}
             <div className="fixed inset-0 z-0">
                 <img 
-                    src="https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=2071&auto=format&fit=crop"
-                    alt="Fondo de salón" 
+                    src="images/LAG.barberia.jpg"
+                    alt="Fondo de barbería" 
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/40"></div>
@@ -121,7 +121,7 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
             {onGoBack && (
                 <button
                     onClick={onGoBack}
-                    className="fixed top-4 left-4 z-20 w-10 h-10 bg-pink-500/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors border border-pink-300"
+                    className="fixed top-4 left-4 z-20 w-10 h-10 bg-zinc-950/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-zinc-900 transition-colors border border-amber-400"
                     title="Volver"
                 >
                     <i className="icon-arrow-left text-white text-xl"></i>
@@ -130,18 +130,18 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
 
             {/* Contenido scrolleable */}
             <div className="relative z-10 min-h-screen flex items-start justify-center py-16 px-4">
-                <div className="w-full max-w-2xl bg-white/20 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-2xl border border-pink-300/50 my-auto">
+                <div className="w-full max-w-2xl bg-black/15 backdrop-blur-[1px] p-6 sm:p-10 rounded-3xl shadow-2xl border border-amber-400/25 my-auto">
                     <div className="text-center space-y-6">
                         {/* Logo o sticker */}
                         {config?.logo_url ? (
                             <img 
                                 src={config.logo_url} 
                                 alt={config.nombre} 
-                                className="w-20 h-20 sm:w-24 sm:h-24 object-contain mx-auto rounded-2xl shadow-2xl ring-4 ring-pink-300/50"
+                                className="w-20 h-20 sm:w-24 sm:h-24 object-contain mx-auto rounded-2xl shadow-2xl ring-4 ring-amber-400/35"
                             />
                         ) : (
                             <div 
-                                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl mx-auto flex items-center justify-center shadow-2xl ring-4 ring-pink-300/50"
+                                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl mx-auto flex items-center justify-center shadow-2xl ring-4 ring-amber-400/35"
                                 style={{ backgroundColor: colorPrimario }}
                             >
                                 <span className="text-4xl sm:text-5xl">{sticker}</span>
@@ -151,10 +151,10 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
                         {/* 🔥 TÍTULO CORREGIDO - SIN DESBORDAMIENTO */}
                         <div className="space-y-2">
                             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight drop-shadow-lg">
-                                Bienvenida a
+                                Bienvenido a
                             </h1>
-                            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-pink-300 break-words px-2">
-                                {config?.nombre || 'Mi Salón'}
+                            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-amber-300 break-words px-2">
+                                {config?.nombre || 'LAG Barberia'}
                             </div>
                         </div>
                         
@@ -165,7 +165,7 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
                         )}
                         
                         <p className="text-white/90 text-base sm:text-lg md:text-xl max-w-lg mx-auto px-2">
-                            {config?.mensaje_bienvenida || '¡Bienvenida a nuestro salón!'}
+                            {config?.mensaje_bienvenida || '¡Bienvenido a nuestra barbería!'}
                         </p>
 
                         {/* BOTONES DE REDES SOCIALES */}
@@ -187,7 +187,7 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
                                 {tieneInstagram && (
                                     <button
                                         onClick={abrirInstagram}
-                                        className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-full flex items-center justify-center hover:scale-110 transition-all transform hover:shadow-xl border-2 border-white/50 group relative"
+                                        className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-zinc-950 via-stone-800 to-amber-700 rounded-full flex items-center justify-center hover:scale-110 transition-all transform hover:shadow-xl border-2 border-white/50 group relative"
                                         title="Instagram"
                                     >
                                         <i className="icon-instagram text-white text-xl sm:text-2xl"></i>
@@ -215,10 +215,10 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
                         <div className="pt-4 sm:pt-6">
                             <button 
                                 onClick={onStart}
-                                className="text-white text-base sm:text-lg font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-full shadow-2xl transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center gap-2 mx-auto border-2 border-pink-300 w-full sm:w-auto"
+                                className="text-white text-base sm:text-lg font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-full shadow-2xl transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center gap-2 mx-auto border-2 border-amber-400 w-full sm:w-auto"
                                 style={{ backgroundColor: colorPrimario }}
                             >
-                                <span className="text-lg sm:text-xl">💖</span>
+                                <span className="text-lg sm:text-xl">🪒</span>
                                 <span>Reservar Turno</span>
                                 <span className="text-lg sm:text-xl">✨</span>
                             </button>
@@ -235,8 +235,11 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
             </div>
 
             {/* Stickers flotantes decorativos (fijos) */}
-            <div className="fixed bottom-4 left-4 text-3xl sm:text-4xl opacity-30 rotate-12 select-none pointer-events-none">💅</div>
-            <div className="fixed top-20 right-4 text-3xl sm:text-4xl opacity-30 -rotate-12 select-none pointer-events-none">🌸</div>
+            <div className="fixed bottom-4 left-4 text-3xl sm:text-4xl opacity-30 rotate-12 select-none pointer-events-none">✂️</div>
+            <div className="fixed top-20 right-4 text-3xl sm:text-4xl opacity-30 -rotate-12 select-none pointer-events-none">💈</div>
         </div>
     );
 }
+
+
+
