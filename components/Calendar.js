@@ -1,4 +1,4 @@
-// components/Calendar.js - VERSIÓN CON DÍAS CERRADOS
+﻿// components/Calendar.js - VERSIÓN CON DÍAS CERRADOS
 
 function Calendar({ onDateSelect, selectedDate, profesional }) {
     const [currentDate, setCurrentDate] = React.useState(new Date());
@@ -131,18 +131,18 @@ function Calendar({ onDateSelect, selectedDate, profesional }) {
     if (cargandoHorarios) {
         return (
             <div className="space-y-4 animate-fade-in">
-                <h2 className="text-lg font-semibold text-pink-700 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-stone-800 flex items-center gap-2">
                     <span className="text-2xl">📅</span>
                     3. Seleccioná una fecha
                     {profesional && (
-                        <span className="text-sm bg-pink-100 text-pink-700 px-3 py-1 rounded-full ml-2">
+                        <span className="text-sm bg-amber-50 text-stone-800 px-3 py-1 rounded-full ml-2">
                             con {profesional.nombre}
                         </span>
                     )}
                 </h2>
                 <div className="text-center py-8">
-                    <div className="animate-spin h-8 w-8 border-b-2 border-pink-500 rounded-full mx-auto"></div>
-                    <p className="text-pink-400 mt-4">Cargando disponibilidad...</p>
+                    <div className="animate-spin h-8 w-8 border-b-2 border-amber-600 rounded-full mx-auto"></div>
+                    <p className="text-amber-500 mt-4">Cargando disponibilidad...</p>
                 </div>
             </div>
         );
@@ -150,36 +150,36 @@ function Calendar({ onDateSelect, selectedDate, profesional }) {
 
     return (
         <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-semibold text-pink-700 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-stone-800 flex items-center gap-2">
                 <span className="text-2xl">📅</span>
                 3. Seleccioná una fecha
                 {profesional && (
-                    <span className="text-sm bg-pink-100 text-pink-700 px-3 py-1 rounded-full ml-2">
+                    <span className="text-sm bg-amber-50 text-stone-800 px-3 py-1 rounded-full ml-2">
                         con {profesional.nombre}
                     </span>
                 )}
                 {selectedDate && (
-                    <span className="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded-full ml-2">
+                    <span className="text-xs bg-amber-50 text-stone-800 px-2 py-1 rounded-full ml-2">
                         ✓ Fecha seleccionada
                     </span>
                 )}
             </h2>
             
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-pink-200 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-pink-50 to-pink-100 border-b border-pink-200">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl border-2 border-amber-200 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-stone-50 to-amber-50 border-b border-amber-200">
                     <button 
                         onClick={prevMonth} 
-                        className="p-2 hover:bg-white/50 rounded-full transition-colors text-pink-600"
+                        className="p-2 hover:bg-white/50 rounded-full transition-colors text-stone-700"
                         title="Mes anterior"
                     >
                         ◀
                     </button>
-                    <span className="font-bold text-pink-800 text-lg capitalize">
+                    <span className="font-bold text-zinc-900 text-lg capitalize">
                         {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
                     </span>
                     <button 
                         onClick={nextMonth} 
-                        className="p-2 hover:bg-white/50 rounded-full transition-colors text-pink-600"
+                        className="p-2 hover:bg-white/50 rounded-full transition-colors text-stone-700"
                         title="Mes siguiente"
                     >
                         ▶
@@ -189,7 +189,7 @@ function Calendar({ onDateSelect, selectedDate, profesional }) {
                 <div className="p-4">
                     <div className="grid grid-cols-7 mb-2 text-center">
                         {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d, i) => (
-                            <div key={i} className={`text-xs font-medium py-1 ${d === 'D' ? 'text-pink-400' : 'text-pink-600'}`}>
+                            <div key={i} className={`text-xs font-medium py-1 ${d === 'D' ? 'text-amber-500' : 'text-stone-700'}`}>
                                 {d}
                             </div>
                         ))}
@@ -211,11 +211,11 @@ function Calendar({ onDateSelect, selectedDate, profesional }) {
                             let className = "h-10 w-full flex items-center justify-center rounded-lg text-sm font-medium transition-all relative";
                             
                             if (selected) {
-                                className += " bg-pink-500 text-white shadow-md scale-105 ring-2 ring-pink-300";
+                                className += " bg-stone-500 text-white shadow-md scale-105 ring-2 ring-amber-300";
                             } else if (!available) {
-                                className += " text-pink-300 cursor-not-allowed bg-pink-50/50";
+                                className += " text-amber-300 cursor-not-allowed bg-stone-50/50";
                             } else {
-                                className += " text-pink-700 hover:bg-pink-100 hover:text-pink-600 hover:scale-105 cursor-pointer";
+                                className += " text-stone-800 hover:bg-amber-50 hover:text-stone-700 hover:scale-105 cursor-pointer";
                             }
                             
                             let title = "";
@@ -246,7 +246,7 @@ function Calendar({ onDateSelect, selectedDate, profesional }) {
                                         <span className="absolute top-0 right-0 text-[10px] text-red-500">🚫</span>
                                     )}
                                     {available && !selected && !cerrado && (
-                                        <span className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-pink-400 rounded-full"></span>
+                                        <span className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-amber-500 rounded-full"></span>
                                     )}
                                 </button>
                             );
@@ -256,9 +256,9 @@ function Calendar({ onDateSelect, selectedDate, profesional }) {
             </div>
 
             {profesional && (
-                <div className="text-xs text-pink-600 bg-pink-50 p-3 rounded-lg border border-pink-200">
+                <div className="text-xs text-stone-700 bg-stone-50 p-3 rounded-lg border border-amber-200">
                     <div className="flex items-center gap-2">
-                        <span className="text-pink-400 text-lg">📅</span>
+                        <span className="text-amber-500 text-lg">📅</span>
                         <span>
                             <strong>Días que trabaja {profesional.nombre}:</strong>{' '}
                             {diasLaborales.length > 0 
@@ -276,9 +276,9 @@ function Calendar({ onDateSelect, selectedDate, profesional }) {
                         </div>
                     )}
                     <div className="flex items-center gap-2 mt-2">
-                        <span className="w-3 h-3 bg-pink-500 rounded-full"></span>
+                        <span className="w-3 h-3 bg-stone-500 rounded-full"></span>
                         <span>Disponible</span>
-                        <span className="w-3 h-3 bg-pink-200 rounded-full ml-3"></span>
+                        <span className="w-3 h-3 bg-amber-100 rounded-full ml-3"></span>
                         <span>No disponible</span>
                         <span className="w-3 h-3 bg-red-300 rounded-full ml-3"></span>
                         <span>Día cerrado</span>

@@ -1,4 +1,4 @@
-// components/admin/ProfesionalesPanel.js
+﻿// components/admin/ProfesionalesPanel.js
 
 function ProfesionalesPanel() {
     const [profesionales, setProfesionales] = React.useState([]);
@@ -144,7 +144,7 @@ function ProfesionalesPanel() {
                                             <span className={`px-2 py-0.5 rounded-full ${
                                                 p.nivel === 1 ? 'bg-gray-100 text-gray-600' :
                                                 p.nivel === 2 ? 'bg-blue-100 text-blue-600' :
-                                                'bg-purple-100 text-purple-600'
+                                                'bg-zinc-100 text-zinc-700'
                                             }`}>
                                                 {getNivelNombre(p.nivel)}
                                             </span>
@@ -194,12 +194,12 @@ function ProfesionalForm({ profesional, onGuardar, onCancelar }) {
         avatar: '👤'
     });
 
-    const avatares = ['👤', '💇', '💅', '👑', '⭐', '🔰'];
+    const avatares = ['👤', '💇', '✂️', '👑', '⭐', '🔰'];
     const colores = [
         { value: 'bg-amber-600', label: 'Ámbar' },
         { value: 'bg-amber-700', label: 'Ámbar Oscuro' },
-        { value: 'bg-pink-500', label: 'Rosa' },
-        { value: 'bg-purple-500', label: 'Púrpura' },
+        { value: 'bg-stone-500', label: 'Ámbar' },
+        { value: 'bg-zinc-700', label: 'Zinc' },
         { value: 'bg-blue-500', label: 'Azul' },
         { value: 'bg-green-500', label: 'Verde' }
     ];

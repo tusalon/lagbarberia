@@ -1,4 +1,4 @@
-// utils/api.js - Versión genérica para profesionales (CORREGIDO)
+﻿// utils/api.js - Versión genérica para profesionales (CORREGIDO)
 
 console.log('📡 api.js cargado');
 

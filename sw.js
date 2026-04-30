@@ -141,3 +141,4 @@ self.addEventListener('message', event => {
 console.log('✅ Service Worker configurado para LAG Barberia');
 console.log('📦 Cache:', CACHE_NAME);
 console.log('📄 Archivos a cachear:', urlsToCache.length);
+

@@ -1,4 +1,4 @@
-// utils/auth-profesionales.js - Autenticación para profesionales (CORREGIDO)
+﻿// utils/auth-profesionales.js - Autenticación para profesionales (CORREGIDO)
 
 console.log('👤 auth-profesionales.js cargado');
 

@@ -1,4 +1,4 @@
-// components/BookingForm.js - VERSIÓN GENÉRICA
+﻿// components/BookingForm.js - VERSIÓN GENÉRICA
 // CON LÓGICA COMPLETA DE NOTIFICACIONES (PUSH SIEMPRE)
 // CORREGIDO: Hora local para archivos ICS
 // MODIFICADO: Solo notifica a la dueña, NO al cliente
@@ -232,7 +232,7 @@ END:VCALENDAR`;
             if (result.success && result.data) {
                 console.log(`✅ Reserva creada en estado ${result.data.estado}`);
                 
-                const nombreNegocio = configNegocio?.nombre || 'Mi Salón';
+                const nombreNegocio = configNegocio?.nombre || 'Mi Barbería';
                 
                 // ❌ ELIMINADO: No enviar WhatsApp al cliente
                 // if (requiereAnticipo && window.enviarMensajePago) {
@@ -283,54 +283,54 @@ END:VCALENDAR`;
     // ============================================
     return (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4 animate-fade-in">
-            <div className="bg-white/95 backdrop-blur-md w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 shadow-xl space-y-6 border-2 border-pink-300">
-                <div className="flex justify-between items-center border-b border-pink-200 pb-4">
-                    <h3 className="text-xl font-bold text-pink-800 flex items-center gap-2">
-                        <span>💖</span>
+            <div className="bg-white/95 backdrop-blur-md w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 shadow-xl space-y-6 border-2 border-amber-300">
+                <div className="flex justify-between items-center border-b border-amber-200 pb-4">
+                    <h3 className="text-xl font-bold text-zinc-900 flex items-center gap-2">
+                        <span>🪒</span>
                         Confirmar Reserva
                     </h3>
-                    <button onClick={onCancel} className="text-pink-400 hover:text-pink-600">
+                    <button onClick={onCancel} className="text-amber-500 hover:text-stone-700">
                         <i className="icon-x text-2xl"></i>
                     </button>
                 </div>
 
                 <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-pink-50 to-pink-100 p-4 rounded-xl border border-pink-200 space-y-2">
-                        <div className="flex items-center gap-3 text-pink-700">
+                    <div className="bg-gradient-to-r from-stone-50 to-amber-50 p-4 rounded-xl border border-amber-200 space-y-2">
+                        <div className="flex items-center gap-3 text-stone-800">
                             <span className="text-2xl">
                                 {service.nombre.toLowerCase().includes('corte') ? '✂️' : 
-                                 service.nombre.toLowerCase().includes('uña') ? '💅' :
-                                 service.nombre.toLowerCase().includes('peinado') ? '💇‍♀️' :
-                                 service.nombre.toLowerCase().includes('maquillaje') ? '💄' : '✨'}
+                                 service.nombre.toLowerCase().includes('uña') ? '✂️' :
+                                 service.nombre.toLowerCase().includes('peinado') ? '💇' :
+                                 service.nombre.toLowerCase().includes('maquillaje') ? '🧴' : '✨'}
                             </span>
                             <span className="font-medium">{service.nombre}</span>
                         </div>
                         
-                        <div className="flex items-center gap-3 text-pink-700">
-                            <span className="text-2xl">👩‍🎨</span>
+                        <div className="flex items-center gap-3 text-stone-800">
+                            <span className="text-2xl">💈</span>
                             <span>Con: <strong>{profesional.nombre}</strong></span>
                         </div>
                         
-                        <div className="flex items-center gap-3 text-pink-700">
+                        <div className="flex items-center gap-3 text-stone-800">
                             <span className="text-2xl">📅</span>
                             <span>{window.formatFechaCompleta ? window.formatFechaCompleta(date) : date}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-pink-700">
+                        <div className="flex items-center gap-3 text-stone-800">
                             <span className="text-2xl">⏰</span>
                             <span>{window.formatTo12Hour ? window.formatTo12Hour(time) : time} ({service.duracion} min)</span>
                         </div>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="bg-pink-50 p-3 rounded-lg border border-pink-200">
-                            <p className="text-sm text-pink-700">
+                        <div className="bg-stone-50 p-3 rounded-lg border border-amber-200">
+                            <p className="text-sm text-stone-800">
                                 <span className="font-semibold">Tus datos:</span> {cliente.nombre} - +{cliente.whatsapp}
                             </p>
                         </div>
 
                         {error && (
-                            <div className="text-pink-600 text-sm bg-pink-100 p-3 rounded-lg flex items-start gap-2 border border-pink-300">
-                                <span className="text-pink-500">⚠️</span>
+                            <div className="text-stone-700 text-sm bg-amber-50 p-3 rounded-lg flex items-start gap-2 border border-amber-300">
+                                <span className="text-amber-600">⚠️</span>
                                 {error}
                             </div>
                         )}
@@ -338,7 +338,7 @@ END:VCALENDAR`;
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full bg-gradient-to-r from-pink-500 to-pink-600 text-white py-3.5 rounded-xl font-bold hover:from-pink-600 hover:to-pink-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 shadow-lg"
+                            className="w-full bg-gradient-to-r from-zinc-900 to-amber-700 text-white py-3.5 rounded-xl font-bold hover:from-zinc-950 hover:to-amber-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 shadow-lg"
                         >
                             {submitting ? (
                                 <>
@@ -347,7 +347,7 @@ END:VCALENDAR`;
                                 </>
                             ) : (
                                 <>
-                                    <span>💖</span>
+                                    <span>🪒</span>
                                     Confirmar Reserva
                                     <span>✨</span>
                                 </>

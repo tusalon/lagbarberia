@@ -1,4 +1,4 @@
-// components/WhatsAppButton.js
+﻿// components/WhatsAppButton.js
 
 function WhatsAppButton() {
     const [telefono, setTelefono] = React.useState('55002272');

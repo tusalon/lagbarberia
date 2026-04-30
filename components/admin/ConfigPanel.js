@@ -1,4 +1,4 @@
-// components/admin/ConfigPanel.js - Versión con Fechas Libres y Días Cerrados Globales
+﻿// components/admin/ConfigPanel.js - Versión con Fechas Libres y Días Cerrados Globales
 // SIN DEPENDENCIA DE dias-cerrados.js
 
 function ConfigPanel({ profesionalId, modoRestringido }) {

@@ -1,4 +1,4 @@
-// components/admin/HorariosPorDiaPanel.js - Panel para configurar horarios por día
+﻿// components/admin/HorariosPorDiaPanel.js - Panel para configurar horarios por día
 
 function HorariosPorDiaPanel({ profesionalId, profesionalNombre, onGuardar, onCancelar }) {
     const [horariosPorDia, setHorariosPorDia] = React.useState({});

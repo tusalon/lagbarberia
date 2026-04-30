@@ -1,7 +1,7 @@
-// utils/servicios.js - Gestión de servicios (CORREGIDO)
+﻿// utils/servicios.js - Gestión de servicios (CORREGIDO)
 // CON FUNCIONES PARA ASIGNAR PROFESIONALES A SERVICIOS
 
-console.log('💅 servicios.js cargado (modo Supabase)');
+console.log('✂️ servicios.js cargado (modo Supabase)');
 
 // Helper para obtener negocio_id - SIN RECURSIÓN
 function getNegocioId() {

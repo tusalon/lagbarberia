@@ -1,4 +1,4 @@
-// utils/dias-cerrados.js - Gestión de días cerrados (feriados, vacaciones)
+﻿// utils/dias-cerrados.js - Gestión de días cerrados (feriados, vacaciones)
 
 console.log('📅 dias-cerrados.js cargado');
 

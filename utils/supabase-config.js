@@ -1,4 +1,4 @@
-// utils/supabase-config.js - Configuración central de Supabase
+﻿// utils/supabase-config.js - Configuración central de Supabase
 // Este archivo es IGUAL para todos los clientes
 
 const SUPABASE_URL = 'https://zorhclhvykikaachfrmp.supabase.co';

@@ -1,4 +1,4 @@
-// utils/auth-clients.js - VERSIÓN CON SOLICITUD DE REGISTRO (ADAPTADA A TU BD)
+﻿// utils/auth-clients.js - VERSIÓN CON SOLICITUD DE REGISTRO (ADAPTADA A TU BD)
 
 console.log('🚀 auth-clients.js CARGADO - MODO SOLICITUD DE REGISTRO');
 

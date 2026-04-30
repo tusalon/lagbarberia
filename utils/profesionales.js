@@ -1,4 +1,4 @@
-// utils/profesionales.js - Gestión de profesionales (CORREGIDO)
+﻿// utils/profesionales.js - Gestión de profesionales (CORREGIDO)
 
 console.log('👥 profesionales.js cargado');
 

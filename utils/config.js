@@ -1,4 +1,4 @@
-// utils/config.js - Configuración del negocio (CORREGIDO)
+﻿// utils/config.js - Configuración del negocio (CORREGIDO)
 
 // ============================================
 // PROTECCIÓN CONTRA DOBLE CARGA

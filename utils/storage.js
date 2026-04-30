@@ -1,4 +1,4 @@
-// utils/storage.js - Funciones para manejar imágenes en Supabase Storage
+﻿// utils/storage.js - Funciones para manejar imágenes en Supabase Storage
 
 console.log('📦 storage.js cargado');
 

@@ -1,4 +1,4 @@
-// components/admin/EditarNegocio.js - VERSIÓN SIN COLORES (CONSERVA LOGO Y HORARIO)
+﻿// components/admin/EditarNegocio.js - VERSIÓN SIN COLORES (CONSERVA LOGO Y HORARIO)
 // + NUEVA SECCIÓN DE ANTICIPOS
 
 function EditarNegocio() {

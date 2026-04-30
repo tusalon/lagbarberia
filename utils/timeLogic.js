@@ -1,4 +1,4 @@
-// utils/timeLogic.js - Versión con límite de 2 horas
+﻿// utils/timeLogic.js - Versión con límite de 2 horas
 
 // Helper to convert "HH:mm" to minutes since midnight
 function timeToMinutes(timeStr) {

@@ -1,4 +1,4 @@
-// components/MyBookings.js - VERSIÓN COMPLETA CORREGIDA
+﻿// components/MyBookings.js - VERSIÓN COMPLETA CORREGIDA
 
 function MyBookings({ cliente, onVolver }) {
     const [bookings, setBookings] = React.useState([]);
@@ -178,18 +178,18 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
     const canceladasCount = bookings.filter(b => b.estado === 'Cancelado').length;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 to-pink-100 pb-20">
+        <div className="min-h-screen bg-gradient-to-br from-stone-50 to-amber-50 pb-20">
             {/* Header */}
-            <div className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-10 border-b border-pink-200">
+            <div className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-10 border-b border-amber-200">
                 <div className="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
                     <button
                         onClick={onVolver}
-                        className="flex items-center gap-2 text-pink-600 hover:text-pink-800 transition"
+                        className="flex items-center gap-2 text-stone-700 hover:text-zinc-900 transition"
                     >
                         <i className="icon-arrow-left text-xl"></i>
                         <span className="font-medium">Volver</span>
                     </button>
-                    <h1 className="text-xl font-bold text-pink-800">✨ Mis Reservas ✨</h1>
+                    <h1 className="text-xl font-bold text-zinc-900">✨ Mis Reservas ✨</h1>
                     <div className="w-20"></div>
                 </div>
             </div>
@@ -198,21 +198,21 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
             <div className="max-w-3xl mx-auto px-4 py-6">
                 
                 {/* Info del cliente */}
-                <div className="bg-white/80 backdrop-blur-sm border border-pink-200 rounded-lg p-4 mb-6">
+                <div className="bg-white/80 backdrop-blur-sm border border-amber-200 rounded-lg p-4 mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 bg-stone-500 rounded-full flex items-center justify-center text-white font-bold">
                             {cliente.nombre.charAt(0)}
                         </div>
                         <div>
-                            <p className="font-medium text-pink-800">{cliente.nombre}</p>
-                            <p className="text-sm text-pink-600">{cliente.whatsapp}</p>
+                            <p className="font-medium text-zinc-900">{cliente.nombre}</p>
+                            <p className="text-sm text-stone-700">{cliente.whatsapp}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Mensaje de error si hay */}
                 {mensajeError && (
-                    <div className="bg-pink-100 border border-pink-300 text-pink-700 p-3 rounded-lg mb-4 text-sm">
+                    <div className="bg-amber-50 border border-amber-300 text-stone-800 p-3 rounded-lg mb-4 text-sm">
                         {mensajeError}
                     </div>
                 )}
@@ -224,8 +224,8 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
                         className={`
                             px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap
                             ${filtro === 'activas' 
-                                ? 'bg-pink-500 text-white shadow-md' 
-                                : 'bg-pink-100 text-pink-700 hover:bg-pink-200'}
+                                ? 'bg-stone-500 text-white shadow-md' 
+                                : 'bg-amber-50 text-stone-800 hover:bg-amber-100'}
                         `}
                     >
                         Activas ({activasCount})
@@ -235,8 +235,8 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
                         className={`
                             px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap
                             ${filtro === 'canceladas' 
-                                ? 'bg-pink-500 text-white shadow-md' 
-                                : 'bg-pink-100 text-pink-700 hover:bg-pink-200'}
+                                ? 'bg-stone-500 text-white shadow-md' 
+                                : 'bg-amber-50 text-stone-800 hover:bg-amber-100'}
                         `}
                     >
                         Canceladas ({canceladasCount})
@@ -246,8 +246,8 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
                         className={`
                             px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap
                             ${filtro === 'todas' 
-                                ? 'bg-pink-500 text-white shadow-md' 
-                                : 'bg-pink-100 text-pink-700 hover:bg-pink-200'}
+                                ? 'bg-stone-500 text-white shadow-md' 
+                                : 'bg-amber-50 text-stone-800 hover:bg-amber-100'}
                         `}
                     >
                         Todas ({bookings.length})
@@ -257,16 +257,16 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
                 {/* Listado de reservas */}
                 {loading ? (
                     <div className="text-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-                        <p className="text-pink-500 mt-4">Cargando tus reservas...</p>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
+                        <p className="text-amber-600 mt-4">Cargando tus reservas...</p>
                     </div>
                 ) : reservasFiltradas.length === 0 ? (
-                    <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-pink-200">
+                    <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-amber-200">
                         <div className="text-6xl mb-4">📅✨</div>
-                        <p className="text-pink-600 mb-2">No tenés reservas {filtro !== 'todas' ? filtro : ''}</p>
+                        <p className="text-stone-700 mb-2">No tenés reservas {filtro !== 'todas' ? filtro : ''}</p>
                         <button
                             onClick={onVolver}
-                            className="text-pink-500 font-medium hover:underline"
+                            className="text-amber-600 font-medium hover:underline"
                         >
                             Reservar un turno
                         </button>
@@ -288,41 +288,41 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
                                 <div
                                     key={booking.id}
                                     className={`
-                                        bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border-l-4 overflow-hidden border border-pink-200
+                                        bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border-l-4 overflow-hidden border border-amber-200
                                         ${booking.estado === 'Cancelado' 
-                                            ? 'border-l-pink-400 opacity-70' 
-                                            : 'border-l-pink-500'}
+                                            ? 'border-l-amber-500 opacity-70' 
+                                            : 'border-l-amber-600'}
                                     `}
                                 >
                                     <div className="p-4">
                                         <div className="flex justify-between items-start mb-3">
                                             <div>
-                                                <span className="text-sm text-pink-600 font-medium block mb-1">
+                                                <span className="text-sm text-stone-700 font-medium block mb-1">
                                                     {fechaConDia}
                                                 </span>
-                                                <h3 className="font-bold text-pink-800 text-lg">{booking.servicio}</h3>
+                                                <h3 className="font-bold text-zinc-900 text-lg">{booking.servicio}</h3>
                                             </div>
                                             <span className={`
                                                 px-3 py-1 rounded-full text-xs font-semibold
-                                                ${booking.estado === 'Reservado' ? 'bg-pink-100 text-pink-700' :
-                                                  booking.estado === 'Confirmado' ? 'bg-pink-200 text-pink-800' :
-                                                  'bg-pink-100 text-pink-500'}
+                                                ${booking.estado === 'Reservado' ? 'bg-amber-50 text-stone-800' :
+                                                  booking.estado === 'Confirmado' ? 'bg-amber-100 text-zinc-900' :
+                                                  'bg-amber-50 text-amber-600'}
                                             `}>
                                                 {booking.estado}
                                             </span>
                                         </div>
                                         
                                         <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-                                            <div className="flex items-center gap-2 text-pink-600">
-                                                <span className="text-pink-400">⏰</span>
+                                            <div className="flex items-center gap-2 text-stone-700">
+                                                <span className="text-amber-500">⏰</span>
                                                 <span>{window.formatTo12Hour ? window.formatTo12Hour(booking.hora_inicio) : booking.hora_inicio}</span>
                                             </div>
-                                            <div className="flex items-center gap-2 text-pink-600">
-                                                <span className="text-pink-400">⏱️</span>
+                                            <div className="flex items-center gap-2 text-stone-700">
+                                                <span className="text-amber-500">⏱️</span>
                                                 <span>{booking.duracion} min</span>
                                             </div>
-                                            <div className="flex items-center gap-2 text-pink-600 col-span-2">
-                                                <span className="text-pink-400">👩‍🎨</span>
+                                            <div className="flex items-center gap-2 text-stone-700 col-span-2">
+                                                <span className="text-amber-500">💈</span>
                                                 <span>Profesional: {profesional}</span>
                                             </div>
                                         </div>
@@ -331,8 +331,8 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
                                             <div className={`
                                                 text-xs p-2 rounded-lg mb-3 flex items-center gap-2
                                                 ${puedeCancelarBooking 
-                                                    ? 'bg-pink-50 text-pink-700 border border-pink-200' 
-                                                    : 'bg-pink-100 text-pink-700 border border-pink-300'}
+                                                    ? 'bg-stone-50 text-stone-800 border border-amber-200' 
+                                                    : 'bg-amber-50 text-stone-800 border border-amber-300'}
                                             `}>
                                                 <span>{puedeCancelarBooking ? '💡' : '⚠️'}</span>
                                                 <span>{tiempoRestante}</span>
@@ -346,15 +346,15 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
                                                 className={`
                                                     w-full py-2 rounded-lg font-medium transition flex items-center justify-center gap-2
                                                     ${puedeCancelarBooking
-                                                        ? 'bg-pink-100 hover:bg-pink-200 text-pink-700'
-                                                        : 'bg-pink-50 text-pink-400 cursor-not-allowed'}
+                                                        ? 'bg-amber-50 hover:bg-amber-100 text-stone-800'
+                                                        : 'bg-stone-50 text-amber-500 cursor-not-allowed'}
                                                     disabled:opacity-50 disabled:cursor-not-allowed
                                                 `}
                                                 title={!puedeCancelarBooking ? "Solo se puede cancelar con al menos 1 hora de anticipación" : ""}
                                             >
                                                 {cancelando ? (
                                                     <>
-                                                        <div className="animate-spin h-4 w-4 border-2 border-pink-600 border-t-transparent rounded-full"></div>
+                                                        <div className="animate-spin h-4 w-4 border-2 border-amber-600 border-t-transparent rounded-full"></div>
                                                         Cancelando...
                                                     </>
                                                 ) : (
@@ -377,3 +377,4 @@ Si no puedes asistir, contactanos por WhatsApp al +53 ${telefonoDuenno}`;
         </div>
     );
 }
+

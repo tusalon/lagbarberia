@@ -214,3 +214,4 @@ setTimeout(async () => {
 
 console.log('✅ config-negocio.js listo para LAG Barberia');
 console.log('🏷️  ID configurado:', NEGOCIO_ID_POR_DEFECTO);
+

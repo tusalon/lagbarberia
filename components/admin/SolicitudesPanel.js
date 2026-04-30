@@ -1,4 +1,4 @@
-// components/admin/SolicitudesPanel.js
+﻿// components/admin/SolicitudesPanel.js
 
 function SolicitudesPanel({ onActualizar }) {
     const [solicitudes, setSolicitudes] = React.useState([]);
@@ -87,7 +87,7 @@ function SolicitudesPanel({ onActualizar }) {
         return (
             <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto"></div>
                     <p className="text-gray-500 mt-2">Cargando solicitudes...</p>
                 </div>
             </div>
@@ -101,14 +101,14 @@ function SolicitudesPanel({ onActualizar }) {
                     <span className="text-2xl">📋</span>
                     Solicitudes de Registro
                     {solicitudes.length > 0 && (
-                        <span className="bg-pink-500 text-white text-xs px-2 py-1 rounded-full">
+                        <span className="bg-stone-500 text-white text-xs px-2 py-1 rounded-full">
                             {solicitudes.length} pendiente{solicitudes.length !== 1 ? 's' : ''}
                         </span>
                     )}
                 </h2>
                 <button 
                     onClick={cargarSolicitudes}
-                    className="text-pink-600 hover:text-pink-800"
+                    className="text-stone-700 hover:text-zinc-900"
                     title="Actualizar"
                 >
                     <i className="icon-refresh-cw"></i>
@@ -124,11 +124,11 @@ function SolicitudesPanel({ onActualizar }) {
             ) : (
                 <div className="space-y-3">
                     {solicitudes.map(solicitud => (
-                        <div key={solicitud.id} className="border border-pink-200 rounded-lg p-4 bg-pink-50/30">
+                        <div key={solicitud.id} className="border border-amber-200 rounded-lg p-4 bg-stone-50/30">
                             <div className="flex justify-between items-start">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2">
-                                        <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                        <div className="w-10 h-10 bg-stone-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                                             {solicitud.nombre.charAt(0).toUpperCase()}
                                         </div>
                                         <div>

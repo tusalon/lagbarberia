@@ -29,7 +29,7 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
     }
 
     const colorPrimario = config?.color_primario || '#8b5a2b';
-    const sticker = config?.especialidad?.toLowerCase().includes('uñas') ? '✂️' : 
+    const sticker = config?.especialidad?.toLowerCase().includes('barbería') ? '✂️' : 
                     config?.especialidad?.toLowerCase().includes('pelo') ? '💇' : 
                     config?.especialidad?.toLowerCase().includes('barber') ? '💈' : '🪒';
 
@@ -240,6 +240,7 @@ function WelcomeScreen({ onStart, onGoBack, cliente, userRol }) {
         </div>
     );
 }
+
 
 
 

@@ -221,7 +221,7 @@ const handleSubmit = async (e) => {
     const nombreNegocio = config?.nombre || 'LAG Barberia';
     const telefonoDuenno = config?.telefono || '55002272';
     const logoUrl = config?.logo_url;
-    const sticker = config?.especialidad?.toLowerCase().includes('uñas') ? '✂️' : 
+    const sticker = config?.especialidad?.toLowerCase().includes('barbería') ? '✂️' : 
                     config?.especialidad?.toLowerCase().includes('pelo') ? '💇' : 
                     config?.especialidad?.toLowerCase().includes('barber') ? '💈' : '🪒';
 
@@ -460,6 +460,7 @@ const handleSubmit = async (e) => {
         </div>
     );
 }
+
 
 
 

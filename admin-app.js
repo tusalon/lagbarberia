@@ -1,4 +1,4 @@
-// admin-app.js - Panel de administración (VERSIÓN GENÉRICA)
+﻿// admin-app.js - Panel de administración (VERSIÓN GENÉRICA)
 // CON BOTÓN DE NUEVA RESERVA MANUAL, CALENDARIO DE DISPONIBILIDAD
 // SIN DEPENDENCIA DE dias-cerrados.js - OBTIENE DÍAS CERRADOS DIRECTAMENTE DE SUPABASE
 // CORREGIDO: Profesionales solo ven sus reservas, pestañas restringidas por nivel
@@ -1065,18 +1065,18 @@ function AdminApp() {
                 'Mi Negocio';
             
             const mensajeCliente = 
-`💅 *${nombreNegocio} - Turno Confirmado* 🎉
+`✂️ *${nombreNegocio} - Turno Confirmado* 🎉
 
 Hola *${bookingData.cliente_nombre}*, ¡tu turno ha sido CONFIRMADO!
 
 📅 *Fecha:* ${fechaConDia}
 ⏰ *Hora:* ${horaFormateada}
-💅 *Servicio:* ${bookingData.servicio}
-👩‍🎨 *Profesional:* ${bookingData.profesional_nombre || bookingData.trabajador_nombre}
+✂️ *Servicio:* ${bookingData.servicio}
+💈 *Profesional:* ${bookingData.profesional_nombre || bookingData.trabajador_nombre}
 
 ✅ *Pago recibido correctamente*
 
-Te esperamos 💖
+Te esperamos 🪒
 Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipación.`;
 
             window.enviarWhatsApp(bookingData.cliente_whatsapp, mensajeCliente);
@@ -1254,34 +1254,34 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
     const disponibilidadDays = getDaysInMonth(disponibilidadFecha);
 
     return (
-        <div className="min-h-screen bg-pink-50 p-3 sm:p-6">
+        <div className="min-h-screen bg-stone-50 p-3 sm:p-6">
             <div className="max-w-6xl mx-auto space-y-4">
                 
                 {/* HEADER CON LOGO */}
-                <div className="bg-white p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-l-4 border-pink-500">
+                <div className="bg-white p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-l-4 border-amber-600">
                     <div className="flex items-center gap-3">
                         {logoNegocio ? (
                             <img 
                                 src={logoNegocio} 
                                 alt={nombreNegocio} 
-                                className="w-12 h-12 object-contain rounded-xl shadow-lg ring-2 ring-pink-300 bg-white p-1"
+                                className="w-12 h-12 object-contain rounded-xl shadow-lg ring-2 ring-amber-300 bg-white p-1"
                                 onError={(e) => {
                                     e.target.onerror = null;
                                     e.target.style.display = 'none';
                                     const parent = e.target.parentElement;
                                     if (parent) {
-                                        parent.innerHTML = '<div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg flex items-center justify-center"><span class="text-2xl text-white">💖</span></div>';
+                                        parent.innerHTML = '<div class="w-12 h-12 bg-gradient-to-br from-zinc-900 to-amber-700 rounded-xl shadow-lg flex items-center justify-center"><span class="text-2xl text-white">🪒</span></div>';
                                     }
                                 }}
                             />
                         ) : (
-                            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg flex items-center justify-center">
-                                <span className="text-2xl text-white">💖</span>
+                            <div className="w-12 h-12 bg-gradient-to-br from-zinc-900 to-amber-700 rounded-xl shadow-lg flex items-center justify-center">
+                                <span className="text-2xl text-white">🪒</span>
                             </div>
                         )}
                         <div>
-                            <h1 className="text-xl font-bold text-pink-800">{nombreNegocio}</h1>
-                            <p className="text-xs text-pink-500">
+                            <h1 className="text-xl font-bold text-zinc-900">{nombreNegocio}</h1>
+                            <p className="text-xs text-amber-600">
                                 {userRole === 'profesional' ? `Panel de ${profesional?.nombre || 'Profesional'}` : 'Panel de Administración'}
                             </p>
                         </div>
@@ -1312,9 +1312,9 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         {(userRole === 'admin' || userNivel >= 3) && (
                             <button
                                 onClick={() => window.location.href = 'editar-negocio.html'}
-                                className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-pink-400 flex-1 sm:flex-none justify-center"
+                                className="flex items-center gap-2 bg-gradient-to-r from-zinc-900 to-amber-700 hover:from-zinc-950 hover:to-amber-800 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md border border-amber-400 flex-1 sm:flex-none justify-center"
                             >
-                                <span className="text-lg">💖</span>
+                                <span className="text-lg">🪒</span>
                                 <span className="font-medium">Editar Negocio</span>
                             </button>
                         )}
@@ -1324,26 +1324,26 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 cargarConfiguracion();
                                 setConfigVersion(prev => prev + 1);
                             }} 
-                            className="p-2 bg-pink-50 rounded-full hover:bg-pink-100 transition-all hover:scale-105 border border-pink-200"
+                            className="p-2 bg-stone-50 rounded-full hover:bg-amber-50 transition-all hover:scale-105 border border-amber-200"
                             title="Recargar datos del negocio"
                         >
-                            <i className="icon-refresh-cw text-pink-600"></i>
+                            <i className="icon-refresh-cw text-stone-700"></i>
                         </button>
 
                         <button 
                             onClick={fetchBookings} 
-                            className="p-2 bg-pink-50 rounded-full hover:bg-pink-100 transition-all hover:scale-105 border border-pink-200"
+                            className="p-2 bg-stone-50 rounded-full hover:bg-amber-50 transition-all hover:scale-105 border border-amber-200"
                             title="Actualizar reservas"
                         >
-                            <i className="icon-refresh-cw text-pink-600"></i>
+                            <i className="icon-refresh-cw text-stone-700"></i>
                         </button>
 
                         <button 
                             onClick={handleLogout}
-                            className="p-2 bg-pink-50 rounded-full hover:bg-pink-100 transition-all hover:scale-105 border border-pink-200"
+                            className="p-2 bg-stone-50 rounded-full hover:bg-amber-50 transition-all hover:scale-105 border border-amber-200"
                             title="Cerrar sesión"
                         >
-                            <i className="icon-log-out text-pink-600"></i>
+                            <i className="icon-log-out text-stone-700"></i>
                         </button>
                     </div>
                 </div>
@@ -1419,9 +1419,9 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                         const esPasado = fechaStr < getCurrentLocalDate();
                                                         
                                                         let className = "h-10 w-full rounded-lg text-sm font-medium";
-                                                        if (selected) className += " bg-pink-500 text-white shadow-md";
+                                                        if (selected) className += " bg-stone-500 text-white shadow-md";
                                                         else if (!available || esPasado || esCerrado) className += " text-gray-300 cursor-not-allowed bg-gray-50 line-through";
-                                                        else className += " text-gray-700 hover:bg-pink-50 cursor-pointer";
+                                                        else className += " text-gray-700 hover:bg-stone-50 cursor-pointer";
                                                         
                                                         return (
                                                             <button key={idx} onClick={() => handleDateSelect(date)} disabled={!available || esPasado || esCerrado} className={className} title={esCerrado ? "Día cerrado" : esPasado ? "Fecha pasada" : ""}>
@@ -1440,7 +1440,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                         {horariosDisponibles.length > 0 ? (
                                             <div className="grid grid-cols-3 gap-2">
                                                 {horariosDisponibles.map(hora => (
-                                                    <button key={hora} type="button" onClick={() => setNuevaReservaData({...nuevaReservaData, hora_inicio: hora})} className={`py-2 px-3 rounded-lg text-sm font-medium ${nuevaReservaData.hora_inicio === hora ? 'bg-pink-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                                                    <button key={hora} type="button" onClick={() => setNuevaReservaData({...nuevaReservaData, hora_inicio: hora})} className={`py-2 px-3 rounded-lg text-sm font-medium ${nuevaReservaData.hora_inicio === hora ? 'bg-stone-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
                                                         {formatTo12Hour(hora)}
                                                     </button>
                                                 ))}
@@ -1493,7 +1493,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                             </div>
                             
                             {disponibilidadCargando ? (
-                                <div className="text-center py-12"><div className="animate-spin h-8 w-8 border-b-2 border-pink-500 mx-auto"></div><p className="mt-2">Cargando disponibilidad...</p></div>
+                                <div className="text-center py-12"><div className="animate-spin h-8 w-8 border-b-2 border-amber-600 mx-auto"></div><p className="mt-2">Cargando disponibilidad...</p></div>
                             ) : (
                                 <div>
                                     <div className="grid grid-cols-7 mb-2 text-center">
@@ -1540,7 +1540,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                 {/* PESTAÑAS */}
                 <div className="bg-white p-2 rounded-xl shadow-sm flex flex-wrap gap-2">
                     {tabsDisponibles.map(tab => (
-                        <button key={tab.id} onClick={() => setTabActivo(tab.id)} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${tabActivo === tab.id ? 'bg-pink-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                        <button key={tab.id} onClick={() => setTabActivo(tab.id)} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${tabActivo === tab.id ? 'bg-stone-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                             <span>{tab.icono}</span>
                             <span>{tab.label}</span>
                         </button>
@@ -1569,7 +1569,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                     <div className="bg-white rounded-xl shadow-sm p-6">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-bold">👥 Clientes Registrados ({clientesRegistrados.length})</h2>
-                            <button onClick={() => { setShowClientesRegistrados(!showClientesRegistrados); if (!showClientesRegistrados) loadClientesRegistrados(); }} className="text-pink-600 text-sm">
+                            <button onClick={() => { setShowClientesRegistrados(!showClientesRegistrados); if (!showClientesRegistrados) loadClientesRegistrados(); }} className="text-stone-700 text-sm">
                                 {showClientesRegistrados ? '▲ Ocultar' : '▼ Mostrar'}
                             </button>
                         </div>
@@ -1591,23 +1591,23 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                 {tabActivo === 'reservas' && (
                     <>
                         {userRole === 'profesional' && profesional && (
-                            <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
-                                <p className="text-pink-800 font-medium">Hola {profesional.nombre} 👋 - Mostrando tus reservas ({filteredBookings.length})</p>
+                            <div className="bg-stone-50 border border-amber-200 rounded-lg p-4">
+                                <p className="text-zinc-900 font-medium">Hola {profesional.nombre} 👋 - Mostrando tus reservas ({filteredBookings.length})</p>
                             </div>
                         )}
 
                         <div className="bg-white p-4 rounded-xl shadow-sm space-y-3">
                             <div className="flex flex-wrap gap-3 items-center">
                                 <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" />
-                                {filterDate && <button onClick={() => setFilterDate('')} className="text-pink-500 text-sm">Limpiar filtro</button>}
+                                {filterDate && <button onClick={() => setFilterDate('')} className="text-amber-600 text-sm">Limpiar filtro</button>}
                             </div>
 
                             <div className="flex flex-wrap gap-2 items-center">
-                                <button onClick={() => setStatusFilter('activas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'activas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Activas ({activasCount})</button>
+                                <button onClick={() => setStatusFilter('activas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'activas' ? 'bg-stone-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Activas ({activasCount})</button>
                                 <button onClick={() => setStatusFilter('pendientes')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'pendientes' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Pendientes ({pendientesCount})</button>
-                                <button onClick={() => setStatusFilter('completadas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'completadas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Completadas ({completadasCount})</button>
-                                <button onClick={() => setStatusFilter('canceladas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'canceladas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Canceladas ({canceladasCount})</button>
-                                <button onClick={() => setStatusFilter('todas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'todas' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Todas ({bookings.length})</button>
+                                <button onClick={() => setStatusFilter('completadas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'completadas' ? 'bg-stone-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Completadas ({completadasCount})</button>
+                                <button onClick={() => setStatusFilter('canceladas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'canceladas' ? 'bg-stone-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Canceladas ({canceladasCount})</button>
+                                <button onClick={() => setStatusFilter('todas')} className={`px-4 py-2 rounded-lg text-sm font-medium ${statusFilter === 'todas' ? 'bg-stone-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Todas ({bookings.length})</button>
                                 {(userRole === 'admin' || userNivel >= 2) && statusFilter === 'canceladas' && (
                                     <button onClick={borrarCanceladas} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm">🗑️ Borrar todas</button>
                                 )}
@@ -1615,7 +1615,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         </div>
 
                         {loading ? (
-                            <div className="text-center py-12"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div><p className="text-pink-500 mt-4">Cargando reservas...</p></div>
+                            <div className="text-center py-12"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div><p className="text-amber-600 mt-4">Cargando reservas...</p></div>
                         ) : (
                             <div className="space-y-3">
                                 {filteredBookings.length === 0 ? (
@@ -1623,23 +1623,23 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                 ) : (
                                     filteredBookings.map(b => (
                                         <div key={b.id} className={`bg-white p-4 rounded-xl shadow-sm border-l-4 ${
-                                            b.estado === 'Reservado' ? 'border-l-pink-500' :
+                                            b.estado === 'Reservado' ? 'border-l-amber-600' :
                                             b.estado === 'Pendiente' ? 'border-l-yellow-500' :
                                             b.estado === 'Completado' ? 'border-l-green-500' :
                                             'border-l-red-500'
                                         }`}>
                                             <div className="flex justify-between mb-2">
                                                 <span className="font-semibold">{window.formatFechaCompleta ? window.formatFechaCompleta(b.fecha) : b.fecha}</span>
-                                                <span className="text-sm bg-pink-100 text-pink-700 px-2 py-1 rounded-full">{formatTo12Hour(b.hora_inicio)}</span>
+                                                <span className="text-sm bg-amber-50 text-stone-800 px-2 py-1 rounded-full">{formatTo12Hour(b.hora_inicio)}</span>
                                             </div>
                                             <div className="text-sm space-y-1">
                                                 <p><span className="font-medium">👤 Cliente:</span> {b.cliente_nombre}</p>
                                                 <p><span className="font-medium">📱 WhatsApp:</span> {b.cliente_whatsapp}</p>
                                                 <p><span className="font-medium">💈 Servicio:</span> {b.servicio}</p>
-                                                <p><span className="font-medium">👩‍🎨 Profesional:</span> {b.profesional_nombre || b.trabajador_nombre}</p>
+                                                <p><span className="font-medium">💈 Profesional:</span> {b.profesional_nombre || b.trabajador_nombre}</p>
                                             </div>
                                             <div className="flex justify-between items-center mt-3 pt-2 border-t">
-                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${b.estado === 'Reservado' ? 'bg-pink-100 text-pink-700' : b.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700' : b.estado === 'Completado' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${b.estado === 'Reservado' ? 'bg-amber-50 text-stone-800' : b.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700' : b.estado === 'Completado' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                                     {b.estado}
                                                 </span>
                                                 <div className="flex gap-2">

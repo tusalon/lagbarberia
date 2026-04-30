@@ -1,8 +1,8 @@
-// components/Header.js
+﻿// components/Header.js
 
 function Header({ cliente, onLogout, onMisReservas, onGoBack, userRol, showBackButton }) {
     const [mostrarOpcionesAdmin, setMostrarOpcionesAdmin] = React.useState(false);
-    const [nombreNegocio, setNombreNegocio] = React.useState('Mi Salón');
+    const [nombreNegocio, setNombreNegocio] = React.useState('Mi Barbería');
 
     React.useEffect(() => {
         window.getNombreNegocio().then(nombre => {

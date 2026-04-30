@@ -1,4 +1,4 @@
-// client-app.js - Aplicación de clientes con flujo completo y PWA
+﻿// client-app.js - Aplicación de clientes con flujo completo y PWA
 // MEJORA: Redirección automática según rol al iniciar
 
 console.log('🚀 CLIENT-APP.JS VERSIÓN:', '2024-03-01');
@@ -214,7 +214,7 @@ function ClientApp() {
             
             case 'service':
                 return (
-                    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-pink-100">
+                    <div className="min-h-screen bg-gradient-to-b from-stone-50 to-amber-50">
                         <Header 
                             cliente={cliente} 
                             onLogout={handleLogout}
@@ -290,7 +290,7 @@ function ClientApp() {
             
             case 'confirmation':
                 return (
-                    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-pink-100">
+                    <div className="min-h-screen bg-gradient-to-b from-stone-50 to-amber-50">
                         <Header 
                             cliente={cliente} 
                             onLogout={handleLogout}
