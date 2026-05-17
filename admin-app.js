@@ -1250,7 +1250,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
             totalCompletadas,
             completadasCiclo,
             meta: Math.max(1, Number(configMembresia?.citasRequeridas || 5)),
-            membresiaActiva: configMembresia?.activa === true
+            califica: completadasCiclo >= Math.max(1, Number(configMembresia?.citasRequeridas || 5))
         };
     };
 
@@ -1640,11 +1640,14 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                         <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
                                                             ✅ {progreso.totalCompletadas} turno{progreso.totalCompletadas === 1 ? '' : 's'} completado{progreso.totalCompletadas === 1 ? '' : 's'}
                                                         </span>
-                                                        {progreso.membresiaActiva && (
-                                                            <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-semibold">
-                                                                🎟️ Membresía: {progreso.completadasCiclo}/{progreso.meta}
-                                                            </span>
-                                                        )}
+                                                        <span className={`px-2 py-1 rounded-full font-semibold ${
+                                                            progreso.califica
+                                                                ? 'bg-amber-600 text-white'
+                                                                : 'bg-amber-100 text-amber-800'
+                                                        }`}>
+                                                            🎟️ Cliente fiel: {progreso.completadasCiclo}/{progreso.meta}
+                                                            {progreso.califica ? ' · Califica para descuento' : ''}
+                                                        </span>
                                                     </div>
                                                 </div>
                                                 {(userRole === 'admin' || userNivel >= 3) && <button onClick={() => handleEliminarCliente(cliente.whatsapp)} className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm">Quitar</button>}
