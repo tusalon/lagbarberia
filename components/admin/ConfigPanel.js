@@ -96,11 +96,19 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
         setMostrarEditorPorDia(true);
     };
 
+    const normalizarConfigMembresia = (config) => ({
+        ...config,
+        membresia_citas_requeridas: Math.max(1, parseInt(config.membresia_citas_requeridas, 10) || 1),
+        membresia_descuento_porcentaje: Math.max(0, Math.min(100, parseFloat(config.membresia_descuento_porcentaje) || 0))
+    });
+
     const handleGuardarConfigGlobal = async () => {
         if (modoRestringido) return;
         
         try {
-            await window.salonConfig.guardar(configGlobal);
+            const configNormalizada = normalizarConfigMembresia(configGlobal);
+            setConfigGlobal(configNormalizada);
+            await window.salonConfig.guardar(configNormalizada);
             alert('✅ Configuración global guardada');
         } catch (error) {
             alert('Error al guardar configuración global');
@@ -251,15 +259,15 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
                                         Citas completadas para ganar descuento
                                     </label>
                                     <input
-                                        type="number"
-                                        value={configGlobal.membresia_citas_requeridas ?? 5}
+                                        type="text"
+                                        inputMode="numeric"
+                                        value={configGlobal.membresia_citas_requeridas ?? ''}
                                         onChange={(e) => setConfigGlobal({
                                             ...configGlobal,
-                                            membresia_citas_requeridas: Math.max(1, parseInt(e.target.value, 10) || 1)
+                                            membresia_citas_requeridas: e.target.value.replace(/\D/g, '')
                                         })}
+                                        onBlur={() => setConfigGlobal(normalizarConfigMembresia(configGlobal))}
                                         className="w-full border rounded-lg px-3 py-2 text-sm"
-                                        min="1"
-                                        step="1"
                                     />
                                     <p className="text-xs text-gray-500 mt-1">
                                         Ej: 5 hace que la cita 6 reciba el descuento.
@@ -271,16 +279,18 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
                                         Descuento para la siguiente cita (%)
                                     </label>
                                     <input
-                                        type="number"
-                                        value={configGlobal.membresia_descuento_porcentaje ?? 0}
+                                        type="text"
+                                        inputMode="decimal"
+                                        value={configGlobal.membresia_descuento_porcentaje ?? ''}
                                         onChange={(e) => setConfigGlobal({
                                             ...configGlobal,
-                                            membresia_descuento_porcentaje: Math.max(0, Math.min(100, parseFloat(e.target.value) || 0))
+                                            membresia_descuento_porcentaje: e.target.value
+                                                .replace(',', '.')
+                                                .replace(/[^\d.]/g, '')
+                                                .replace(/(\..*)\./g, '$1')
                                         })}
+                                        onBlur={() => setConfigGlobal(normalizarConfigMembresia(configGlobal))}
                                         className="w-full border rounded-lg px-3 py-2 text-sm"
-                                        min="0"
-                                        max="100"
-                                        step="1"
                                     />
                                     <p className="text-xs text-gray-500 mt-1">
                                         Cuando se aplica, el conteo vuelve a empezar.
