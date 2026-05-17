@@ -320,6 +320,11 @@ function AdminApp() {
     const [logoNegocio, setLogoNegocio] = React.useState(null);
     
     const [config, setConfig] = React.useState(null);
+    const [configMembresia, setConfigMembresia] = React.useState({
+        activa: false,
+        citasRequeridas: 5,
+        descuentoPorcentaje: 0
+    });
     const [configVersion, setConfigVersion] = React.useState(0);
     
     const [tabActivo, setTabActivo] = React.useState('reservas');
@@ -406,6 +411,17 @@ function AdminApp() {
             }
             if (configData?.logo_url) {
                 setLogoNegocio(configData.logo_url);
+            }
+            if (window.salonConfig) {
+                const configGlobal = await window.salonConfig.get();
+                const membresia = window.getConfigMembresia
+                    ? window.getConfigMembresia(configGlobal)
+                    : {
+                        activa: configGlobal?.membresia_activa === true,
+                        citasRequeridas: Math.max(1, Number(configGlobal?.membresia_citas_requeridas || 5)),
+                        descuentoPorcentaje: Math.max(0, Math.min(100, Number(configGlobal?.membresia_descuento_porcentaje || 0)))
+                    };
+                setConfigMembresia(membresia);
             }
             console.log('✅ Configuración recargada:', configData);
         } catch (error) {
@@ -1205,6 +1221,39 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
     const canceladasCount = bookings.filter(b => b.estado === 'Cancelado').length;
     const filteredBookings = getFilteredBookings();
 
+    const normalizarWhatsappCliente = (whatsapp) => {
+        const limpio = String(whatsapp || '').replace(/\D/g, '');
+        if (!limpio) return '';
+        return limpio.startsWith('53') ? limpio : `53${limpio}`;
+    };
+
+    const getProgresoCliente = (cliente) => {
+        const telefonoCliente = normalizarWhatsappCliente(cliente?.whatsapp);
+        const reservasCliente = bookings
+            .filter(reserva => normalizarWhatsappCliente(reserva.cliente_whatsapp) === telefonoCliente)
+            .sort((a, b) => {
+                const fechaA = `${a.fecha || ''} ${a.hora_inicio || ''}`;
+                const fechaB = `${b.fecha || ''} ${b.hora_inicio || ''}`;
+                return fechaA.localeCompare(fechaB);
+            });
+
+        const totalCompletadas = reservasCliente.filter(reserva => reserva.estado === 'Completado').length;
+        const ultimoDescuentoIndex = reservasCliente.reduce((ultimo, reserva, index) => {
+            return reserva.membresia_descuento_aplicado ? index : ultimo;
+        }, -1);
+        const completadasCiclo = reservasCliente
+            .slice(ultimoDescuentoIndex + 1)
+            .filter(reserva => reserva.estado === 'Completado')
+            .length;
+
+        return {
+            totalCompletadas,
+            completadasCiclo,
+            meta: Math.max(1, Number(configMembresia?.citasRequeridas || 5)),
+            membresiaActiva: configMembresia?.activa === true
+        };
+    };
+
     // ============================================
     // PESTAÑAS DISPONIBLES SEGÚN ROL Y NIVEL
     // ============================================
@@ -1580,12 +1629,28 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                         {showClientesRegistrados && (
                             <div className="space-y-2 max-h-96 overflow-y-auto">
                                 {clientesRegistrados.length === 0 ? <p className="text-center text-gray-500">No hay clientes registrados</p> :
-                                    clientesRegistrados.map((cliente, idx) => (
-                                        <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                            <div><p className="font-medium">{cliente.nombre}</p><p className="text-sm text-gray-500">+{cliente.whatsapp}</p></div>
-                                            {(userRole === 'admin' || userNivel >= 3) && <button onClick={() => handleEliminarCliente(cliente.whatsapp)} className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm">Quitar</button>}
-                                        </div>
-                                    ))}
+                                    clientesRegistrados.map((cliente, idx) => {
+                                        const progreso = getProgresoCliente(cliente);
+                                        return (
+                                            <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                                <div>
+                                                    <p className="font-medium">{cliente.nombre}</p>
+                                                    <p className="text-sm text-gray-500">+{cliente.whatsapp}</p>
+                                                    <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                                                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+                                                            ✅ {progreso.totalCompletadas} turno{progreso.totalCompletadas === 1 ? '' : 's'} completado{progreso.totalCompletadas === 1 ? '' : 's'}
+                                                        </span>
+                                                        {progreso.membresiaActiva && (
+                                                            <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-semibold">
+                                                                🎟️ Membresía: {progreso.completadasCiclo}/{progreso.meta}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                {(userRole === 'admin' || userNivel >= 3) && <button onClick={() => handleEliminarCliente(cliente.whatsapp)} className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm">Quitar</button>}
+                                            </div>
+                                        );
+                                    })}
                             </div>
                         )}
                     </div>
