@@ -284,6 +284,58 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
 };
 
 // ============================================
+// FUNCIÓN: AVISAR AL CLIENTE QUE SU TURNO TIENE DESCUENTO
+// ============================================
+window.notificarReservaClienteFiel = async function(booking, configNegocio) {
+    try {
+        if (!booking) {
+            console.error('❌ No hay datos de reserva');
+            return false;
+        }
+
+        if (!booking.membresia_descuento_aplicado) {
+            console.log('ℹ️ La reserva no tiene descuento de cliente fiel');
+            return false;
+        }
+
+        if (!configNegocio) {
+            configNegocio = await window.cargarConfiguracionNegocio();
+        }
+
+        const fechaConDia = window.formatFechaCompleta ? 
+            window.formatFechaCompleta(booking.fecha) : 
+            booking.fecha;
+        
+        const horaFormateada = window.formatTo12Hour ? 
+            window.formatTo12Hour(booking.hora_inicio) : 
+            booking.hora_inicio;
+
+        const profesional = booking.profesional_nombre || booking.trabajador_nombre || 'No asignada';
+        const lineaMembresia = window.generarTextoMembresia ? window.generarTextoMembresia(booking) : '';
+
+        const mensajeCliente =
+`🎟️ *${configNegocio?.nombre || 'Mi Barbería'} - Cliente fiel*
+
+Hola *${booking.cliente_nombre}*, tu turno ha sido agendado.
+
+📅 *Fecha:* ${fechaConDia}
+⏰ *Hora:* ${horaFormateada}
+✂️ *Servicio:* ${booking.servicio}
+💈 *Profesional:* ${profesional}
+${lineaMembresia}
+
+Gracias por elegirnos una y otra vez. ¡Te esperamos! 🪒`;
+
+        window.enviarWhatsApp(booking.cliente_whatsapp, mensajeCliente);
+        console.log('✅ Cliente notificado con descuento de cliente fiel');
+        return true;
+    } catch (error) {
+        console.error('Error en notificarReservaClienteFiel:', error);
+        return false;
+    }
+};
+
+// ============================================
 // NOTIFICACIÓN DE NUEVA RESERVA (SIN ANTICIPO) - CON PUSH
 // ============================================
 window.notificarNuevaReserva = async function(booking) {

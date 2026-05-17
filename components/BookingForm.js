@@ -274,8 +274,23 @@ END:VCALENDAR`;
                 //     await window.enviarConfirmacionReserva(result.data, configNegocio);
                 // }
                 
-                // ✅ SOLO notificar a la dueña
-                if (requiereAnticipo) {
+                // Si ganó descuento de cliente fiel, avisar al cliente directamente.
+                if (result.data.membresia_descuento_aplicado && window.notificarReservaClienteFiel) {
+                    if (window.enviarNotificacionPush) {
+                        await window.enviarNotificacionPush(
+                            `🎟️ ${nombreNegocio} - Cliente fiel`,
+                            `Cliente fiel: ${result.data.cliente_nombre}
+Servicio: ${result.data.servicio}
+Precio final: ${result.data.precio_final} CUP
+Descuento: ${result.data.membresia_descuento_porcentaje}%`,
+                            'ticket',
+                            'default'
+                        );
+                    }
+
+                    await window.notificarReservaClienteFiel(result.data, configNegocio);
+                    console.log('📱 Cliente notificado: TURNO CON DESCUENTO DE CLIENTE FIEL');
+                } else if (requiereAnticipo) {
                     if (window.notificarReservaPendiente) {
                         await window.notificarReservaPendiente(result.data);
                     }
