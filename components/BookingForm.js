@@ -6,6 +6,7 @@
 function BookingForm({ service, profesional, date, time, onSubmit, onCancel, cliente }) {
     const [submitting, setSubmitting] = React.useState(false);
     const [error, setError] = React.useState(null);
+    const [membresiaPreview, setMembresiaPreview] = React.useState(null);
 
     // ============================================
     // FUNCIÓN PARA PARTIR LÍNEAS LARGAS (RFC 5545)
@@ -190,6 +191,38 @@ END:VCALENDAR`;
         }
     }
 
+    React.useEffect(() => {
+        let cancelado = false;
+
+        const cargarPreviewMembresia = async () => {
+            try {
+                if (!cliente || !service || !date || !time || typeof window.evaluarMembresia !== 'function') {
+                    setMembresiaPreview(null);
+                    return;
+                }
+
+                const evaluacion = await window.evaluarMembresia({
+                    cliente_whatsapp: cliente.whatsapp,
+                    servicio: service.nombre,
+                    precio_original: service.precio
+                });
+
+                if (!cancelado) {
+                    setMembresiaPreview(evaluacion.califica ? evaluacion : null);
+                }
+            } catch (error) {
+                console.error('Error evaluando membresía:', error);
+                if (!cancelado) setMembresiaPreview(null);
+            }
+        };
+
+        cargarPreviewMembresia();
+
+        return () => {
+            cancelado = true;
+        };
+    }, [cliente?.whatsapp, service?.nombre, service?.precio, date, time]);
+
     // ============================================
     // HANDLE SUBMIT (CORREGIDO - SOLO NOTIFICAR A DUEÑA)
     // ============================================
@@ -327,6 +360,15 @@ END:VCALENDAR`;
                                 <span className="font-semibold">Tus datos:</span> {cliente.nombre} - +{cliente.whatsapp}
                             </p>
                         </div>
+
+                        {membresiaPreview && (
+                            <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                                <p className="text-sm font-semibold text-stone-900">Descuento de cliente fiel aplicado</p>
+                                <p className="text-sm text-stone-700">
+                                    Este turno saldrá en {membresiaPreview.precioFinal} CUP con {membresiaPreview.descuentoPorcentaje}% de descuento.
+                                </p>
+                            </div>
+                        )}
 
                         {error && (
                             <div className="text-stone-700 text-sm bg-amber-50 p-3 rounded-lg flex items-start gap-2 border border-amber-300">

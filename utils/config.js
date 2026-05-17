@@ -24,7 +24,10 @@ let configuracionGlobal = {
     duracion_turnos: 60,
     intervalo_entre_turnos: 0,
     modo_24h: false,
-    max_antelacion_dias: 30
+    max_antelacion_dias: 30,
+    membresia_activa: false,
+    membresia_citas_requeridas: 5,
+    membresia_descuento_porcentaje: 0
 };
 
 let horariosProfesionales = {};
@@ -136,7 +139,10 @@ window.salonConfig = {
                 duracion_turnos: nuevaConfig.duracion_turnos || 60,
                 intervalo_entre_turnos: nuevaConfig.intervalo_entre_turnos || 0,
                 modo_24h: nuevaConfig.modo_24h || false,
-                max_antelacion_dias: nuevaConfig.max_antelacion_dias || 30
+                max_antelacion_dias: nuevaConfig.max_antelacion_dias || 30,
+                membresia_activa: nuevaConfig.membresia_activa === true,
+                membresia_citas_requeridas: Math.max(1, parseInt(nuevaConfig.membresia_citas_requeridas, 10) || 5),
+                membresia_descuento_porcentaje: Math.max(0, Math.min(100, parseFloat(nuevaConfig.membresia_descuento_porcentaje) || 0))
             };
             
             console.log('📤 Datos a enviar:', datosAGuardar);

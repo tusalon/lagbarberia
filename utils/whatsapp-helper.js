@@ -143,6 +143,7 @@ window.enviarMensajePago = async function(booking, configNegocio) {
             window.formatTo12Hour(booking.hora_inicio) : 
             booking.hora_inicio;
 
+        const lineaMembresia = window.generarTextoMembresia ? window.generarTextoMembresia(booking) : '';
         const profesional = booking.profesional_nombre || booking.trabajador_nombre || 'No asignada';
 
         const mensajeFinal = 
@@ -154,6 +155,7 @@ window.enviarMensajePago = async function(booking, configNegocio) {
 ⏰ *Hora:* ${horaFormateada}
 ✂️ *Servicio:* ${booking.servicio}
 💈 *Profesional:* ${profesional}
+${lineaMembresia}
 
 💰 *Para confirmar tu turno*, envía el *anticipo de ${montoAnticipo} CUP* por:
 
@@ -203,6 +205,7 @@ window.enviarConfirmacionReserva = async function(booking, configNegocio) {
         const horaFormateada = window.formatTo12Hour ? 
             window.formatTo12Hour(booking.hora_inicio) : 
             booking.hora_inicio;
+        const lineaMembresia = window.generarTextoMembresia ? window.generarTextoMembresia(booking) : '';
 
         const mensajeConfirmacion = 
 `✅ *${configNegocio?.nombre || 'Mi Barbería'} - Turno Confirmado*
@@ -213,6 +216,7 @@ Hola *${booking.cliente_nombre}*, tu turno ha sido agendado.
 ⏰ *Hora:* ${horaFormateada}
 ✂️ *Servicio:*${booking.servicio}
 💈 *Profesional:* ${booking.profesional_nombre || booking.trabajador_nombre}
+${lineaMembresia}
 
 ¡Te esperamos! ❤️`;
 
@@ -250,6 +254,7 @@ window.enviarConfirmacionPago = async function(booking, configNegocio) {
             booking.hora_inicio;
 
         const nombreNegocio = configNegocio?.nombre || 'Mi Barbería';
+        const lineaMembresia = window.generarTextoMembresia ? window.generarTextoMembresia(booking) : '';
 
         const mensajeConfirmacion = 
 `✂️ *${nombreNegocio} - Turno Confirmado* 🎉
@@ -260,6 +265,7 @@ Hola *${booking.cliente_nombre}*, ¡tu turno ha sido CONFIRMADO!
 ⏰ *Hora:* ${horaFormateada}
 ✂️ *Servicio:* ${booking.servicio}
 💈 *Profesional:* ${booking.profesional_nombre || booking.trabajador_nombre}
+${lineaMembresia}
 
 ✅ *Pago recibido correctamente*
 
@@ -300,6 +306,7 @@ window.notificarNuevaReserva = async function(booking) {
             booking.hora_inicio;
             
         const profesional = booking.profesional_nombre || booking.trabajador_nombre || 'No asignada';
+        const lineaMembresia = window.generarTextoMembresia ? window.generarTextoMembresia(booking) : '';
         
         const mensajeWhatsApp = 
 `🎉 *NUEVA RESERVA - ${config.nombre}*
@@ -310,6 +317,7 @@ window.notificarNuevaReserva = async function(booking) {
 📅 *Fecha:* ${fechaConDia}
 ⏰ *Hora:* ${horaFormateada}
 💈 *Profesional:* ${profesional}
+${lineaMembresia}
 
 ✅ Reserva confirmada automáticamente.`;
 
@@ -379,6 +387,7 @@ window.notificarReservaPendiente = async function(booking) {
                 booking.hora_inicio;
 
             const profesional = booking.profesional_nombre || booking.trabajador_nombre || 'No asignada';
+            const lineaMembresia = window.generarTextoMembresia ? window.generarTextoMembresia(booking) : '';
 
             const mensajeFinal = 
 `✂️ *${configNegocio.nombre || 'Mi Barbería'} - Confirmación de Turno*
@@ -389,6 +398,7 @@ window.notificarReservaPendiente = async function(booking) {
 ⏰ *Hora:* ${horaFormateada}
 ✂️ *Servicio:* ${booking.servicio}
 💈 *Profesional:* ${profesional}
+${lineaMembresia}
 
 💰 *Para confirmar tu turno*, envía el *anticipo de ${montoAnticipo} CUP* por:
 
@@ -435,6 +445,7 @@ El turno se cancelará automáticamente si no se confirma el pago dentro de las 
             booking.hora_inicio;
             
         const profesional = booking.profesional_nombre || booking.trabajador_nombre || 'No asignada';
+        const lineaMembresia = window.generarTextoMembresia ? window.generarTextoMembresia(booking) : '';
         
         const mensajeWhatsApp = 
 `🆕 *RESERVA PENDIENTE DE PAGO - ${config.nombre}*
@@ -445,6 +456,7 @@ El turno se cancelará automáticamente si no se confirma el pago dentro de las 
 📅 *Fecha:* ${fechaConDia}
 ⏰ *Hora:* ${horaFormateada}
 💈 *Profesional:* ${profesional}
+${lineaMembresia}
 💰 *Estado:* Pendiente de pago
 
 ✅ Ingresá al panel para confirmar el pago:`;

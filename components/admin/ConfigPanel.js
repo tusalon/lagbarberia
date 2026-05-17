@@ -9,7 +9,10 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
         duracion_turnos: 60,
         intervalo_entre_turnos: 0,
         modo_24h: false,
-        max_antelacion_dias: 30
+        max_antelacion_dias: 30,
+        membresia_activa: false,
+        membresia_citas_requeridas: 5,
+        membresia_descuento_porcentaje: 0
     });
     const [cargando, setCargando] = React.useState(true);
     const [nombreNegocio, setNombreNegocio] = React.useState('');
@@ -70,7 +73,10 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
                     duracion_turnos: 60,
                     intervalo_entre_turnos: 0,
                     modo_24h: false,
-                    max_antelacion_dias: 30
+                    max_antelacion_dias: 30,
+                    membresia_activa: false,
+                    membresia_citas_requeridas: 5,
+                    membresia_descuento_porcentaje: 0
                 });
             }
         } catch (error) {
@@ -208,6 +214,64 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
                                 />
                                 <span className="text-sm text-gray-700">Modo 24 horas</span>
                             </label>
+                        </div>
+
+                        <div className="mb-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                            <label className="flex items-center gap-3 cursor-pointer mb-4">
+                                <input
+                                    type="checkbox"
+                                    checked={configGlobal.membresia_activa || false}
+                                    onChange={(e) => setConfigGlobal({
+                                        ...configGlobal,
+                                        membresia_activa: e.target.checked
+                                    })}
+                                    className="w-5 h-5 text-amber-600"
+                                />
+                                <span className="text-sm font-semibold text-stone-900">Activar membresía de cliente fiel</span>
+                            </label>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Citas completadas para ganar descuento
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={configGlobal.membresia_citas_requeridas ?? 5}
+                                        onChange={(e) => setConfigGlobal({
+                                            ...configGlobal,
+                                            membresia_citas_requeridas: Math.max(1, parseInt(e.target.value, 10) || 1)
+                                        })}
+                                        className="w-full border rounded-lg px-3 py-2 text-sm"
+                                        min="1"
+                                        step="1"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Ej: 5 hace que la cita 6 reciba el descuento.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Descuento para la siguiente cita (%)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={configGlobal.membresia_descuento_porcentaje ?? 0}
+                                        onChange={(e) => setConfigGlobal({
+                                            ...configGlobal,
+                                            membresia_descuento_porcentaje: Math.max(0, Math.min(100, parseFloat(e.target.value) || 0))
+                                        })}
+                                        className="w-full border rounded-lg px-3 py-2 text-sm"
+                                        min="0"
+                                        max="100"
+                                        step="1"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Cuando se aplica, el conteo vuelve a empezar.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                         
                         <button
@@ -594,4 +658,4 @@ function DiasCerradosGlobalesPanel() {
             )}
         </div>
     );
-}s
+}

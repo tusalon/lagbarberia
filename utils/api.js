@@ -87,7 +87,7 @@ async function createBooking(bookingData) {
     try {
         const negocioId = getNegocioId();
         
-        const dataForSupabase = {
+        let dataForSupabase = {
             negocio_id: negocioId,
             cliente_nombre: bookingData.cliente_nombre,
             cliente_whatsapp: bookingData.cliente_whatsapp,
@@ -100,6 +100,10 @@ async function createBooking(bookingData) {
             hora_fin: bookingData.hora_fin,
             estado: bookingData.estado || 'Reservado'
         };
+
+        if (typeof window.aplicarMembresiaReserva === 'function') {
+            dataForSupabase = await window.aplicarMembresiaReserva(dataForSupabase);
+        }
 
         console.log('📤 Enviando a Supabase:', dataForSupabase);
 

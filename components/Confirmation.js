@@ -30,6 +30,7 @@ function Confirmation({ booking, onReset }) {
     const fechaConDia = window.formatFechaCompleta ? 
         window.formatFechaCompleta(booking.fecha) : 
         booking.fecha;
+    const tieneDescuentoMembresia = booking.membresia_descuento_aplicado === true;
 
     return (
         <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 animate-fade-in bg-gradient-to-b from-stone-50 to-amber-50">
@@ -73,6 +74,18 @@ function Confirmation({ booking, onReset }) {
                         <div className="text-xs text-amber-500 uppercase tracking-wider font-semibold mb-1">Profesional</div>
                         <div className="font-medium text-stone-800">{booking.profesional_nombre || booking.trabajador_nombre || 'No asignada'}</div>
                     </div>
+
+                    {tieneDescuentoMembresia && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                            <div className="text-xs text-amber-600 uppercase tracking-wider font-semibold mb-1">Cliente fiel</div>
+                            <div className="font-bold text-stone-900">
+                                Tu turno sale en {booking.precio_final} CUP
+                            </div>
+                            <div className="text-sm text-stone-700">
+                                Descuento de {booking.membresia_descuento_porcentaje}% por tus citas completadas.
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

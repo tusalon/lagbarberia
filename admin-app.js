@@ -132,10 +132,14 @@ async function createBooking(bookingData) {
             return { success: false, error: 'No hay negocioId' };
         }
         
-        const dataWithNegocio = {
+        let dataWithNegocio = {
             ...bookingData,
             negocio_id: negocioId
         };
+
+        if (typeof window.aplicarMembresiaReserva === 'function') {
+            dataWithNegocio = await window.aplicarMembresiaReserva(dataWithNegocio);
+        }
         
         console.log('📤 Creando reserva para negocio:', negocioId, dataWithNegocio);
         
