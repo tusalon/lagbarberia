@@ -1246,11 +1246,16 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
             .filter(reserva => reserva.estado === 'Completado')
             .length;
 
+        const meta = Math.max(1, Number(configMembresia?.citasRequeridas || 5));
+        const descuentoActivo = configMembresia?.activa === true && Number(configMembresia?.descuentoPorcentaje || 0) > 0;
+
         return {
             totalCompletadas,
             completadasCiclo,
-            meta: Math.max(1, Number(configMembresia?.citasRequeridas || 5)),
-            califica: completadasCiclo >= Math.max(1, Number(configMembresia?.citasRequeridas || 5))
+            meta,
+            descuentoActivo,
+            metaCumplida: completadasCiclo >= meta,
+            califica: descuentoActivo && completadasCiclo >= meta
         };
     };
 
@@ -1643,10 +1648,13 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                         <span className={`px-2 py-1 rounded-full font-semibold ${
                                                             progreso.califica
                                                                 ? 'bg-amber-600 text-white'
-                                                                : 'bg-amber-100 text-amber-800'
+                                                                : progreso.metaCumplida
+                                                                    ? 'bg-orange-100 text-orange-800'
+                                                                    : 'bg-amber-100 text-amber-800'
                                                         }`}>
                                                             🎟️ Cliente fiel: {progreso.completadasCiclo}/{progreso.meta}
                                                             {progreso.califica ? ' · Califica para descuento' : ''}
+                                                            {!progreso.califica && progreso.metaCumplida ? ' · Activa membresía/%' : ''}
                                                         </span>
                                                     </div>
                                                 </div>
