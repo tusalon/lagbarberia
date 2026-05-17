@@ -277,7 +277,7 @@ END:VCALENDAR`;
                 // Si ganó descuento de cliente fiel, avisar al cliente directamente.
                 if (result.data.membresia_descuento_aplicado && window.notificarReservaClienteFiel) {
                     if (window.enviarNotificacionPush) {
-                        await window.enviarNotificacionPush(
+                        window.enviarNotificacionPush(
                             `🎟️ ${nombreNegocio} - Cliente fiel`,
                             `Cliente fiel: ${result.data.cliente_nombre}
 Servicio: ${result.data.servicio}
@@ -285,7 +285,9 @@ Precio final: ${result.data.precio_final} CUP
 Descuento: ${result.data.membresia_descuento_porcentaje}%`,
                             'ticket',
                             'default'
-                        );
+                        ).catch(error => {
+                            console.error('Error enviando push de cliente fiel:', error);
+                        });
                     }
 
                     await window.notificarReservaClienteFiel(result.data, configNegocio);
