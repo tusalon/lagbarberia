@@ -274,24 +274,14 @@ END:VCALENDAR`;
                 //     await window.enviarConfirmacionReserva(result.data, configNegocio);
                 // }
                 
-                // Si ganó descuento de cliente fiel, avisar al cliente directamente.
-                if (result.data.membresia_descuento_aplicado && window.notificarReservaClienteFiel) {
-                    if (window.enviarNotificacionPush) {
-                        window.enviarNotificacionPush(
-                            `🎟️ ${nombreNegocio} - Cliente fiel`,
-                            `Cliente fiel: ${result.data.cliente_nombre}
-Servicio: ${result.data.servicio}
-Precio final: ${result.data.precio_final} CUP
-Descuento: ${result.data.membresia_descuento_porcentaje}%`,
-                            'ticket',
-                            'default'
-                        ).catch(error => {
-                            console.error('Error enviando push de cliente fiel:', error);
-                        });
+                // Si ganó descuento de cliente fiel, avisar al admin con el detalle del descuento.
+                if (result.data.membresia_descuento_aplicado) {
+                    if (requiereAnticipo && window.notificarReservaPendiente) {
+                        await window.notificarReservaPendiente(result.data);
+                    } else if (window.notificarNuevaReserva) {
+                        await window.notificarNuevaReserva(result.data);
                     }
-
-                    await window.notificarReservaClienteFiel(result.data, configNegocio);
-                    console.log('📱 Cliente notificado: TURNO CON DESCUENTO DE CLIENTE FIEL');
+                    console.log('📱 Admin notificado: TURNO CON DESCUENTO DE CLIENTE FIEL');
                 } else if (requiereAnticipo) {
                     if (window.notificarReservaPendiente) {
                         await window.notificarReservaPendiente(result.data);

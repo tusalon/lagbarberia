@@ -27,8 +27,24 @@ console.log('🎟️ membresia.js cargado');
         return {
             activa: config.membresia_activa === true,
             citasRequeridas: Math.max(1, Number(config.membresia_citas_requeridas || 5)),
-            descuentoPorcentaje: Math.max(0, Math.min(100, Number(config.membresia_descuento_porcentaje || 0)))
+            descuentoPorcentaje: Math.max(0, Math.min(100, Number(config.membresia_descuento_porcentaje || 0))),
+            contarDesde: config.membresia_contar_desde || null
         };
+    }
+
+    function getReservaDateTime(reserva) {
+        if (!reserva?.fecha) return null;
+        const hora = reserva.hora_inicio || '00:00';
+        const fecha = new Date(`${reserva.fecha}T${hora}:00`);
+        return Number.isNaN(fecha.getTime()) ? null : fecha;
+    }
+
+    function getFechaCorteMasReciente(...fechas) {
+        return fechas
+            .filter(Boolean)
+            .map(fecha => new Date(fecha))
+            .filter(fecha => !Number.isNaN(fecha.getTime()))
+            .sort((a, b) => b.getTime() - a.getTime())[0] || null;
     }
 
     async function calcularPrecioServicios(servicioNombre) {
@@ -80,6 +96,36 @@ console.log('🎟️ membresia.js cargado');
         }
     }
 
+    async function getResetClienteMembresia(whatsapp) {
+        try {
+            const negocioId = getNegocioIdMembresia();
+            const variantes = variantesTelefono(whatsapp);
+            if (!negocioId || !variantes.length || !window.SUPABASE_URL) return null;
+
+            const orFilter = variantes.map(numero => `whatsapp.eq.${numero}`).join(',');
+            const response = await fetch(
+                `${window.SUPABASE_URL}/rest/v1/clientes_autorizados?negocio_id=eq.${negocioId}&or=(${orFilter})&select=membresia_reset_at&limit=1`,
+                {
+                    headers: {
+                        'apikey': window.SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    cache: 'no-store'
+                }
+            );
+
+            if (!response.ok) return null;
+
+            const data = await response.json();
+            return Array.isArray(data) ? data[0]?.membresia_reset_at || null : null;
+        } catch (error) {
+            console.error('Error cargando reset de membresía:', error);
+            return null;
+        }
+    }
+
     async function evaluarMembresia(bookingData, configGlobal = null) {
         const config = configGlobal || (window.salonConfig ? await window.salonConfig.get() : {});
         const membresia = getConfigMembresia(config);
@@ -96,7 +142,17 @@ console.log('🎟️ membresia.js cargado');
 
         if (!membresia.activa || membresia.descuentoPorcentaje <= 0) return base;
 
-        const historial = await getHistorialClienteMembresia(bookingData.cliente_whatsapp);
+        const [historialCompleto, resetCliente] = await Promise.all([
+            getHistorialClienteMembresia(bookingData.cliente_whatsapp),
+            getResetClienteMembresia(bookingData.cliente_whatsapp)
+        ]);
+        const fechaCorte = getFechaCorteMasReciente(membresia.contarDesde, resetCliente);
+        const historial = fechaCorte
+            ? historialCompleto.filter(reserva => {
+                const fechaReserva = getReservaDateTime(reserva);
+                return fechaReserva && fechaReserva >= fechaCorte;
+            })
+            : historialCompleto;
         const ultimoDescuentoIndex = historial.reduce((ultimo, reserva, index) => {
             return reserva.membresia_descuento_aplicado ? index : ultimo;
         }, -1);

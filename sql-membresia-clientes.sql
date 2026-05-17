@@ -4,7 +4,11 @@
 alter table public.configuracion
 add column if not exists membresia_activa boolean not null default false,
 add column if not exists membresia_citas_requeridas integer not null default 5,
-add column if not exists membresia_descuento_porcentaje numeric not null default 0;
+add column if not exists membresia_descuento_porcentaje numeric not null default 0,
+add column if not exists membresia_contar_desde timestamptz;
+
+alter table public.clientes_autorizados
+add column if not exists membresia_reset_at timestamptz;
 
 alter table public.reservas
 add column if not exists membresia_descuento_aplicado boolean not null default false,

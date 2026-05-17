@@ -356,4 +356,43 @@ window.eliminarCliente = async function(whatsapp) {
     }
 };
 
+// ============================================
+// REINICIAR SECUENCIA DE MEMBRESÍA DE UN CLIENTE
+// ============================================
+
+window.reiniciarMembresiaCliente = async function(whatsapp) {
+    try {
+        const negocioId = getNegocioId();
+        const numero = String(whatsapp || '').replace(/\D/g, '');
+        const variantes = Array.from(new Set([
+            numero,
+            numero.startsWith('53') ? numero.replace(/^53(?=\d{8,}$)/, '') : `53${numero}`
+        ].filter(Boolean)));
+        const orFilter = variantes.map(item => `whatsapp.eq.${item}`).join(',');
+
+        const response = await fetch(
+            `${window.SUPABASE_URL}/rest/v1/clientes_autorizados?negocio_id=eq.${negocioId}&or=(${orFilter})`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'apikey': window.SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ membresia_reset_at: new Date().toISOString() })
+            }
+        );
+
+        if (!response.ok) {
+            console.error('Error reiniciando membresía:', await response.text());
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error en reiniciarMembresiaCliente:', error);
+        return false;
+    }
+};
+
 console.log('✅ auth-clients.js inicializado - MODO SOLICITUD DE REGISTRO ACTIVADO');

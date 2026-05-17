@@ -323,7 +323,8 @@ function AdminApp() {
     const [configMembresia, setConfigMembresia] = React.useState({
         activa: false,
         citasRequeridas: 5,
-        descuentoPorcentaje: 0
+        descuentoPorcentaje: 0,
+        contarDesde: null
     });
     const [configVersion, setConfigVersion] = React.useState(0);
     
@@ -419,7 +420,8 @@ function AdminApp() {
                     : {
                         activa: configGlobal?.membresia_activa === true,
                         citasRequeridas: Math.max(1, Number(configGlobal?.membresia_citas_requeridas || 5)),
-                        descuentoPorcentaje: Math.max(0, Math.min(100, Number(configGlobal?.membresia_descuento_porcentaje || 0)))
+                        descuentoPorcentaje: Math.max(0, Math.min(100, Number(configGlobal?.membresia_descuento_porcentaje || 0))),
+                        contarDesde: configGlobal?.membresia_contar_desde || null
                     };
                 setConfigMembresia(membresia);
             }
@@ -955,6 +957,28 @@ function AdminApp() {
         }
     };
 
+    const handleReiniciarMembresiaCliente = async (cliente) => {
+        if (!confirm(`¿Reiniciar a 0 la secuencia de turnos completados de ${cliente.nombre}?`)) return;
+
+        try {
+            if (typeof window.reiniciarMembresiaCliente !== 'function') {
+                alert('Actualiza la app e intenta de nuevo.');
+                return;
+            }
+
+            const ok = await window.reiniciarMembresiaCliente(cliente.whatsapp);
+            if (ok) {
+                alert(`✅ Secuencia de ${cliente.nombre} reiniciada`);
+                await loadClientesRegistrados();
+            } else {
+                alert('No se pudo reiniciar la secuencia.');
+            }
+        } catch (error) {
+            console.error('Error reiniciando secuencia:', error);
+            alert('Error al reiniciar la secuencia.');
+        }
+    };
+
     // ============================================
     // FUNCIONES DE RESERVAS
     // ============================================
@@ -1227,10 +1251,30 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
         return limpio.startsWith('53') ? limpio : `53${limpio}`;
     };
 
+    const getFechaReserva = (reserva) => {
+        if (!reserva?.fecha) return null;
+        const fecha = new Date(`${reserva.fecha}T${reserva.hora_inicio || '00:00'}:00`);
+        return Number.isNaN(fecha.getTime()) ? null : fecha;
+    };
+
+    const getFechaCorteMembresia = (cliente) => {
+        return [configMembresia?.contarDesde, cliente?.membresia_reset_at]
+            .filter(Boolean)
+            .map(fecha => new Date(fecha))
+            .filter(fecha => !Number.isNaN(fecha.getTime()))
+            .sort((a, b) => b.getTime() - a.getTime())[0] || null;
+    };
+
     const getProgresoCliente = (cliente) => {
         const telefonoCliente = normalizarWhatsappCliente(cliente?.whatsapp);
+        const fechaCorte = getFechaCorteMembresia(cliente);
         const reservasCliente = bookings
             .filter(reserva => normalizarWhatsappCliente(reserva.cliente_whatsapp) === telefonoCliente)
+            .filter(reserva => {
+                if (!fechaCorte) return true;
+                const fechaReserva = getFechaReserva(reserva);
+                return fechaReserva && fechaReserva >= fechaCorte;
+            })
             .sort((a, b) => {
                 const fechaA = `${a.fecha || ''} ${a.hora_inicio || ''}`;
                 const fechaB = `${b.fecha || ''} ${b.hora_inicio || ''}`;
@@ -1255,7 +1299,8 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
             meta,
             descuentoActivo,
             metaCumplida: completadasCiclo >= meta,
-            califica: descuentoActivo && completadasCiclo >= meta
+            califica: descuentoActivo && completadasCiclo >= meta,
+            fechaCorte
         };
     };
 
@@ -1643,7 +1688,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                     <p className="text-sm text-gray-500">+{cliente.whatsapp}</p>
                                                     <div className="mt-2 flex flex-wrap gap-2 text-xs">
                                                         <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-                                                            ✅ {progreso.totalCompletadas} turno{progreso.totalCompletadas === 1 ? '' : 's'} completado{progreso.totalCompletadas === 1 ? '' : 's'}
+                                                            ✅ {progreso.completadasCiclo} turno{progreso.completadasCiclo === 1 ? '' : 's'} completado{progreso.completadasCiclo === 1 ? '' : 's'} en secuencia
                                                         </span>
                                                         <span className={`px-2 py-1 rounded-full font-semibold ${
                                                             progreso.califica
@@ -1656,9 +1701,19 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                             {progreso.califica ? ' · Califica para descuento' : ''}
                                                             {!progreso.califica && progreso.metaCumplida ? ' · Activa membresía/%' : ''}
                                                         </span>
+                                                        {progreso.fechaCorte && (
+                                                            <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                                                                Medido desde {progreso.fechaCorte.toLocaleDateString()}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
-                                                {(userRole === 'admin' || userNivel >= 3) && <button onClick={() => handleEliminarCliente(cliente.whatsapp)} className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm">Quitar</button>}
+                                                {(userRole === 'admin' || userNivel >= 3) && (
+                                                    <div className="flex flex-col gap-2">
+                                                        <button onClick={() => handleReiniciarMembresiaCliente(cliente)} className="px-3 py-1 bg-amber-600 text-white rounded-lg text-sm">Reiniciar a 0</button>
+                                                        <button onClick={() => handleEliminarCliente(cliente.whatsapp)} className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm">Quitar</button>
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })}

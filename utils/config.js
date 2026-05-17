@@ -27,7 +27,8 @@ let configuracionGlobal = {
     max_antelacion_dias: 30,
     membresia_activa: false,
     membresia_citas_requeridas: 5,
-    membresia_descuento_porcentaje: 0
+    membresia_descuento_porcentaje: 0,
+    membresia_contar_desde: null
 };
 
 let horariosProfesionales = {};
@@ -142,7 +143,8 @@ window.salonConfig = {
                 max_antelacion_dias: nuevaConfig.max_antelacion_dias || 30,
                 membresia_activa: nuevaConfig.membresia_activa === true,
                 membresia_citas_requeridas: Math.max(1, parseInt(nuevaConfig.membresia_citas_requeridas, 10) || 5),
-                membresia_descuento_porcentaje: Math.max(0, Math.min(100, parseFloat(nuevaConfig.membresia_descuento_porcentaje) || 0))
+                membresia_descuento_porcentaje: Math.max(0, Math.min(100, parseFloat(nuevaConfig.membresia_descuento_porcentaje) || 0)),
+                membresia_contar_desde: nuevaConfig.membresia_contar_desde || null
             };
             
             console.log('📤 Datos a enviar:', datosAGuardar);

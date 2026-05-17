@@ -12,7 +12,8 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
         max_antelacion_dias: 30,
         membresia_activa: false,
         membresia_citas_requeridas: 5,
-        membresia_descuento_porcentaje: 0
+        membresia_descuento_porcentaje: 0,
+        membresia_contar_desde: null
     });
     const [cargando, setCargando] = React.useState(true);
     const [nombreNegocio, setNombreNegocio] = React.useState('');
@@ -76,7 +77,8 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
                     max_antelacion_dias: 30,
                     membresia_activa: false,
                     membresia_citas_requeridas: 5,
-                    membresia_descuento_porcentaje: 0
+                    membresia_descuento_porcentaje: 0,
+                    membresia_contar_desde: null
                 });
             }
         } catch (error) {
@@ -103,6 +105,19 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
         } catch (error) {
             alert('Error al guardar configuración global');
         }
+    };
+
+    const handleComenzarMedicionMembresia = async () => {
+        if (modoRestringido) return;
+        if (!confirm('¿Comenzar a medir la membresía desde este momento? Los turnos completados anteriores no contarán para el próximo descuento.')) return;
+
+        const nuevaConfig = {
+            ...configGlobal,
+            membresia_contar_desde: new Date().toISOString()
+        };
+
+        setConfigGlobal(nuevaConfig);
+        await window.salonConfig.guardar(nuevaConfig);
     };
 
     if (cargando) {
@@ -271,6 +286,19 @@ function ConfigPanel({ profesionalId, modoRestringido }) {
                                         Cuando se aplica, el conteo vuelve a empezar.
                                     </p>
                                 </div>
+                            </div>
+
+                            <div className="mt-4 p-3 bg-white rounded-lg border border-amber-200">
+                                <p className="text-xs text-gray-500 mb-2">
+                                    Medición actual desde: {configGlobal.membresia_contar_desde ? new Date(configGlobal.membresia_contar_desde).toLocaleString() : 'Siempre'}
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={handleComenzarMedicionMembresia}
+                                    className="bg-stone-700 text-white px-3 py-2 rounded-lg hover:bg-stone-800 transition text-sm"
+                                >
+                                    Comenzar a medir turnos desde ahora
+                                </button>
                             </div>
                         </div>
                         
