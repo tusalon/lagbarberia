@@ -47,7 +47,8 @@ console.log('🎟️ membresia.js cargado');
 
     function getReservaDateTime(reserva) {
         if (!reserva?.fecha) return null;
-        const hora = reserva.hora_inicio || '00:00';
+        const partesHora = String(reserva.hora_inicio || '00:00').split(':');
+        const hora = `${(partesHora[0] || '00').padStart(2, '0')}:${(partesHora[1] || '00').padStart(2, '0')}`;
         const fecha = new Date(`${reserva.fecha}T${hora}:00`);
         return Number.isNaN(fecha.getTime()) ? null : fecha;
     }
