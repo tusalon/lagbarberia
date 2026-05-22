@@ -1311,6 +1311,42 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
         };
     };
 
+    const clientesConRecord = (() => {
+        const mapaClientes = new Map();
+
+        clientesRegistrados.forEach(cliente => {
+            const telefono = normalizarWhatsappCliente(cliente?.whatsapp);
+            if (!telefono) return;
+
+            mapaClientes.set(telefono, {
+                ...cliente,
+                whatsapp: cliente.whatsapp || `53${telefono}`,
+                origenRecord: 'registrado'
+            });
+        });
+
+        bookings.forEach(reserva => {
+            const telefono = normalizarWhatsappCliente(reserva?.cliente_whatsapp);
+            if (!telefono) return;
+
+            if (!mapaClientes.has(telefono)) {
+                mapaClientes.set(telefono, {
+                    nombre: reserva.cliente_nombre || 'Cliente sin nombre',
+                    whatsapp: `53${telefono}`,
+                    fecha_registro: null,
+                    membresia_reset_at: null,
+                    origenRecord: 'reservas'
+                });
+            }
+        });
+
+        return Array.from(mapaClientes.values()).sort((a, b) => {
+            const progresoA = getProgresoCliente(a);
+            const progresoB = getProgresoCliente(b);
+            return progresoB.completadasCiclo - progresoA.completadasCiclo || String(a.nombre || '').localeCompare(String(b.nombre || ''));
+        });
+    })();
+
     // ============================================
     // PESTAÑAS DISPONIBLES SEGÚN ROL Y NIVEL
     // ============================================
@@ -1678,20 +1714,25 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                 {tabActivo === 'clientes' && (userRole === 'admin' || userNivel >= 2) && (
                     <div className="bg-white rounded-xl shadow-sm p-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-bold">👥 Clientes Registrados ({clientesRegistrados.length})</h2>
+                            <h2 className="text-xl font-bold">👥 Clientes con Record ({clientesConRecord.length})</h2>
                             <button onClick={() => { setShowClientesRegistrados(!showClientesRegistrados); if (!showClientesRegistrados) loadClientesRegistrados(); }} className="text-stone-700 text-sm">
                                 {showClientesRegistrados ? '▲ Ocultar' : '▼ Mostrar'}
                             </button>
                         </div>
                         {showClientesRegistrados && (
                             <div className="space-y-2 max-h-96 overflow-y-auto">
-                                {clientesRegistrados.length === 0 ? <p className="text-center text-gray-500">No hay clientes registrados</p> :
-                                    clientesRegistrados.map((cliente, idx) => {
+                                {clientesConRecord.length === 0 ? <p className="text-center text-gray-500">No hay clientes con reservas registradas</p> :
+                                    clientesConRecord.map((cliente, idx) => {
                                         const progreso = getProgresoCliente(cliente);
                                         return (
                                             <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                                                 <div>
-                                                    <p className="font-medium">{cliente.nombre}</p>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <p className="font-medium">{cliente.nombre}</p>
+                                                        {cliente.origenRecord === 'reservas' && (
+                                                            <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-semibold">Detectado por reservas</span>
+                                                        )}
+                                                    </div>
                                                     <p className="text-sm text-gray-500">+{cliente.whatsapp}</p>
                                                     <div className="mt-2 flex flex-wrap gap-2 text-xs">
                                                         <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
@@ -1715,7 +1756,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
                                                         )}
                                                     </div>
                                                 </div>
-                                                {(userRole === 'admin' || userNivel >= 3) && (
+                                                {(userRole === 'admin' || userNivel >= 3) && cliente.origenRecord === 'registrado' && (
                                                     <div className="flex flex-col gap-2">
                                                         <button onClick={() => handleReiniciarMembresiaCliente(cliente)} className="px-3 py-1 bg-amber-600 text-white rounded-lg text-sm">Reiniciar a 0</button>
                                                         <button onClick={() => handleEliminarCliente(cliente.whatsapp)} className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm">Quitar</button>
