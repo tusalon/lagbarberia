@@ -197,7 +197,7 @@ async function marcarTurnosCompletados() {
         console.log('🕐 Hora LOCAL actual:', `${horaActual}:${minutosActuales}`);
         
         const responsePasados = await fetch(
-            `${window.SUPABASE_URL}/rest/v1/reservas?negocio_id=eq.${negocioId}&estado=eq.Reservado&fecha=lt.${hoy}&select=id,fecha,hora_inicio,hora_fin,cliente_nombre,servicio,profesional_nombre`,
+            `${window.SUPABASE_URL}/rest/v1/reservas?negocio_id=eq.${negocioId}&estado=eq.Reservado&fecha=lt.${hoy}&select=id,fecha,hora_inicio,hora_fin,cliente_nombre,cliente_whatsapp,servicio,profesional_nombre`,
             {
                 headers: {
                     'apikey': window.SUPABASE_ANON_KEY,
@@ -214,7 +214,7 @@ async function marcarTurnosCompletados() {
         const turnosPasados = await responsePasados.json();
         
         const responseHoy = await fetch(
-            `${window.SUPABASE_URL}/rest/v1/reservas?negocio_id=eq.${negocioId}&estado=eq.Reservado&fecha=eq.${hoy}&select=id,fecha,hora_inicio,hora_fin,cliente_nombre,servicio,profesional_nombre`,
+            `${window.SUPABASE_URL}/rest/v1/reservas?negocio_id=eq.${negocioId}&estado=eq.Reservado&fecha=eq.${hoy}&select=id,fecha,hora_inicio,hora_fin,cliente_nombre,cliente_whatsapp,servicio,profesional_nombre`,
             {
                 headers: {
                     'apikey': window.SUPABASE_ANON_KEY,
@@ -242,7 +242,7 @@ async function marcarTurnosCompletados() {
             for (const turno of turnosACompletar) {
                 console.log(`📝 Completando turno de ${turno.cliente_nombre} - ${turno.fecha} ${turno.hora_inicio} a ${turno.hora_fin}`);
                 
-                await fetch(
+                const completarResponse = await fetch(
                     `${window.SUPABASE_URL}/rest/v1/reservas?negocio_id=eq.${negocioId}&id=eq.${turno.id}`,
                     {
                         method: 'PATCH',
@@ -254,6 +254,11 @@ async function marcarTurnosCompletados() {
                         body: JSON.stringify({ estado: 'Completado' })
                     }
                 );
+
+                if (!completarResponse.ok) {
+                    console.error(`❌ Error completando turno ${turno.id}:`, await completarResponse.text());
+                    continue;
+                }
             }
             
             console.log(`✅ ${turnosACompletar.length} turnos marcados como completados`);
@@ -850,10 +855,12 @@ function AdminApp() {
             const endTime = calculateEndTime(nuevaReservaData.hora_inicio, servicio.duracion);
             const configNegocio = await window.cargarConfiguracionNegocio();
             const requiereAnticipo = nuevaReservaData.requiereAnticipo;
+            const whatsappLimpio = nuevaReservaData.cliente_whatsapp.replace(/\D/g, '');
+            const whatsappLocal = whatsappLimpio.length > 8 ? whatsappLimpio.slice(-8) : whatsappLimpio;
             
             const bookingData = {
                 cliente_nombre: nuevaReservaData.cliente_nombre,
-                cliente_whatsapp: `53${nuevaReservaData.cliente_whatsapp.replace(/\D/g, '')}`,
+                cliente_whatsapp: `53${whatsappLocal}`,
                 servicio: nuevaReservaData.servicio,
                 duracion: servicio.duracion,
                 profesional_id: nuevaReservaData.profesional_id,
@@ -1248,7 +1255,7 @@ Cualquier cambio, podés cancelarlo desde la app con hasta 1 hora de anticipaci�
     const normalizarWhatsappCliente = (whatsapp) => {
         const limpio = String(whatsapp || '').replace(/\D/g, '');
         if (!limpio) return '';
-        return limpio.startsWith('53') ? limpio : `53${limpio}`;
+        return limpio.length > 8 ? limpio.slice(-8) : limpio;
     };
 
     const getFechaReserva = (reserva) => {

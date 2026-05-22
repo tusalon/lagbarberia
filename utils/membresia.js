@@ -14,13 +14,26 @@ console.log('🎟️ membresia.js cargado');
     function normalizarTelefono(telefono) {
         const limpio = String(telefono || '').replace(/\D/g, '');
         if (!limpio) return '';
-        return limpio.startsWith('53') ? limpio : `53${limpio}`;
+        const local = getTelefonoLocal(telefono);
+        return local ? `53${local}` : limpio;
+    }
+
+    function getTelefonoLocal(telefono) {
+        const limpio = String(telefono || '').replace(/\D/g, '');
+        if (!limpio) return '';
+        return limpio.length > 8 ? limpio.slice(-8) : limpio;
     }
 
     function variantesTelefono(telefono) {
+        const limpio = String(telefono || '').replace(/\D/g, '');
+        const local = getTelefonoLocal(telefono);
         const normalizado = normalizarTelefono(telefono);
-        const sinCodigo = normalizado.replace(/^53(?=\d{8,}$)/, '');
-        return Array.from(new Set([normalizado, sinCodigo, String(telefono || '').replace(/\D/g, '')].filter(Boolean)));
+        return Array.from(new Set([
+            normalizado,
+            local,
+            limpio,
+            local ? `5353${local}` : ''
+        ].filter(Boolean)));
     }
 
     function getConfigMembresia(config = {}) {
