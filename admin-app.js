@@ -1292,7 +1292,7 @@ Cualquier cambio, podÃ©s cancelarlo desde la app con hasta 1 hora de anticipaciÃ
 
         const totalCompletadas = reservasCliente.filter(reserva => reserva.estado === 'Completado').length;
         const ultimoDescuentoIndex = reservasCliente.reduce((ultimo, reserva, index) => {
-            return reserva.membresia_descuento_aplicado ? index : ultimo;
+            return reserva.membresia_descuento_aplicado && reserva.estado !== 'Cancelado' ? index : ultimo;
         }, -1);
         const completadasCiclo = reservasCliente
             .slice(ultimoDescuentoIndex + 1)

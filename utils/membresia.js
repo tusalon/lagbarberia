@@ -168,7 +168,7 @@ console.log('🎟️ membresia.js cargado');
             })
             : historialCompleto;
         const ultimoDescuentoIndex = historial.reduce((ultimo, reserva, index) => {
-            return reserva.membresia_descuento_aplicado ? index : ultimo;
+            return reserva.membresia_descuento_aplicado && reserva.estado !== 'Cancelado' ? index : ultimo;
         }, -1);
         const historialCiclo = historial.slice(ultimoDescuentoIndex + 1);
         const tieneDescuentoPendiente = historial.some(reserva =>
