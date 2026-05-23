@@ -1,6 +1,6 @@
 ﻿// sw.js - Service Worker para LAG Barberia
 
-const CACHE_NAME = 'lag-barberia-v2';
+const CACHE_NAME = 'lag-barberia-v3';
 const urlsToCache = [
   '/lagbarberia/',
   '/lagbarberia/index.html',
