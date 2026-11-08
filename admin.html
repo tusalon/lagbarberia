@@ -1,77 +1,22 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - LAG Barberia</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
-    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
-    <link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAG Barberia</title>
+<meta name="robots" content="noindex">
+<noscript><meta http-equiv="refresh" content="1;url=https://tusalon.github.io/rservasroma/admin.html?s=lag-barberia"></noscript>
+<script>
+// Este salón ya vive en la app nueva. Se conservan los parámetros que traiga el enlace.
+(function () {
+    var q = new URLSearchParams(location.search);
+    q.set('s', "lag-barberia");
+    location.replace("https://tusalon.github.io/rservasroma/admin.html" + '?' + q.toString() + location.hash);
+})();
+</script>
 </head>
-<body class="bg-gray-100">
-    <div id="root"></div>
-
-    <!-- Scripts - ORDEN CORRECTO -->
-    <script src="utils/supabase-config.js"></script>
-    <script src="utils/config-negocio.js"></script>
-    <script src="utils/storage.js"></script>
-    <script src="utils/api.js"></script>
-    <script src="utils/timeLogic.js"></script>
-    <script src="utils/auth-clients.js"></script>
-    <script src="utils/auth-profesionales.js"></script>
-    <script src="utils/servicios.js"></script>
-    <script src="utils/profesionales.js"></script>
-    <script src="utils/config.js"></script>
-    <script src="utils/membresia.js?v=20260523-canceladas-record"></script>
-    <script src="utils/whatsapp-helper.js"></script>
-
-    <!-- Componentes admin -->
-    <script src="components/admin/ConfigPanel.js" type="text/babel"></script>
-    <script src="components/admin/ServiciosPanel.js" type="text/babel"></script>
-    <script src="components/admin/ProfesionalesPanel.js" type="text/babel"></script>
-    <script src="components/admin/HorariosPorDiaPanel.js" type="text/babel"></script>
-    <script src="components/admin/SolicitudesPanel.js" type="text/babel"></script> 
-    <script src="admin-app.js?v=20260523-canceladas-record" type="text/babel"></script>
-
-    <script>
-        (function() {
-            console.log('🔍 ADMIN.HTML - Verificando sesión...');
-            console.log('📦 localStorage keys:', Object.keys(localStorage));
-            console.log('   negocioId:', localStorage.getItem('negocioId'));
-            console.log('   profesionalAuth:', localStorage.getItem('profesionalAuth') ? 'presente' : 'ausente');
-            console.log('   adminAuth:', localStorage.getItem('adminAuth'));
-            console.log('   userRole:', localStorage.getItem('userRole'));
-            
-            const negocioId = localStorage.getItem('negocioId');
-            const profesionalAuth = localStorage.getItem('profesionalAuth');
-            
-            if (!negocioId) {
-                console.log('🚫 No hay negocioId, redirigiendo a login');
-                window.location.href = 'admin-login.html';
-                return;
-            }
-            
-            // Si es profesional, no necesita validar adminLoginTime
-            if (profesionalAuth) {
-                console.log('✅ Sesión de profesional detectada, continuando...');
-                return;
-            }
-            
-            // Para admin, verificar tiempo de sesión (8 horas)
-            const loginTime = localStorage.getItem('adminLoginTime');
-            const isValidSession = loginTime && (Date.now() - parseInt(loginTime)) < 8 * 60 * 60 * 1000;
-            
-            if (!isValidSession) {
-                console.log('⏰ Sesión de admin expirada o inválida');
-                localStorage.clear();
-                window.location.href = 'admin-login.html';
-                return;
-            }
-            
-            console.log('✅ Sesión de admin válida, cargando panel...');
-        })();
-    </script>
+<body style="font-family:system-ui,-apple-system,sans-serif;text-align:center;padding:48px 24px;color:#444">
+<p style="font-size:18px">Te llevamos a la versión nueva de <strong>LAG Barberia</strong>…</p>
+<p><a href="https://tusalon.github.io/rservasroma/admin.html?s=lag-barberia" style="color:#d81b60;font-weight:bold">Toca aquí si no se abre sola</a></p>
 </body>
 </html>
